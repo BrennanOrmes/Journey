@@ -1,1 +1,1 @@
-web: gunicorn aberdeengo.wsgi.py --log-file -
+web: gunicorn wsgi --log-file -
