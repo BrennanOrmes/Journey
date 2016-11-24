@@ -1,1 +1,1 @@
-web: gunicorn aberdeengo.wsgi --log-file -
+web: python manage.py run_gunicorn $IP:$PORT
