@@ -1,1 +1,1 @@
-web: gunicorn top/aberdeengo.wsgi --log-file -
+web: gunicorn top.aberdeengo.wsgi --log-file -
