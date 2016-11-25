@@ -47,3 +47,5 @@ wheel==0.24.0
 whitenoise==3.2.2
 wsgiref==0.1.2
 zope.interface==4.0.5
+--allow-unverified django-admin-tools
+django-admin-tools==0.5.1
