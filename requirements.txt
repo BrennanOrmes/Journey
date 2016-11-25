@@ -1,8 +1,10 @@
+--allow-unverified BzrTools
 BzrTools==2.6.0
 Django==1.9
 Pillow==2.3.0
 SecretStorage==2.0.0
 argparse==1.2.1
+--allow-unverified bzr
 bzr==2.7.0dev1
 chardet==2.0.1
 colorama==0.2.5
