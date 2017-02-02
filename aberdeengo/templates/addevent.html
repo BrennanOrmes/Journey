@@ -1,0 +1,73 @@
+
+{% extends "layout.html" %}
+{% block content %}
+
+
+   
+    
+        <h2>Event Information</h2>
+        <form action="{% url 'addevent'%}" method="post">
+            {% csrf_token %}
+            <label for="title">Event Name</label>
+				<input type="text" id="title" name="title" placeholder="Your Event">
+				<br>
+				<label for="title">Event Location</label>
+				<input type="text" id="location" name="location" placeholder="Your Location">
+				<div id="map" style="width:100%;height:500px;"></div>
+
+        <script>
+        
+        var markersArray = []; // A 1D Array for holding one marker.
+        
+        function myMap() {
+          var mapCanvas = document.getElementById("map");
+          var myCenter=new google.maps.LatLng(51.508742,-0.120850); //Just a placeholder location for the map to load up.
+          var mapOptions = {center: myCenter, zoom: 5};
+          var map = new google.maps.Map(mapCanvas, mapOptions);
+          google.maps.event.addListener(map, 'click', function(event) {
+            placeMarker(map, event.latLng);
+          });
+        }
+        
+        function placeMarker(map, location) {
+          var marker = new google.maps.Marker({
+            position: location,
+            map: map
+          });
+         
+          clearOverlays();
+          markersArray.push(marker);
+          
+          var infowindow = new google.maps.InfoWindow({
+            content: 'Latitude: ' + location.lat() + '<br>Longitude: ' + location.lng()
+          });
+          infowindow.open(map,marker);
+        }
+        
+        function clearOverlays() {
+          for (var i = 0; i < markersArray.length; i++ ) {
+            markersArray[i].setMap(null);
+          }
+          markersArray.length = 0;
+          markersArray = [];
+        }
+        </script>
+				  
+		<script src="https://maps.googleapis.com/maps/api/js?callback=myMap"></script>
+    <!-- <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyClKcWsgdYmlnLItSUiD5YaJgbrD9ahed4&callback=initMap">
+    </script> -->
+				<br>
+				<label for="title">Event Description</label>
+				<input type="text" id="description" name="description" placeholder="What your event is about">
+				<br>
+				<label for="title">Event Start Date</label>
+				<input type="text" id="startdate" name="startdate" placeholder="2016-11-25T12:00:00">
+				<br>
+				<label for="title">Event End Date</label>
+				<input type="text" id="enddate" name="enddate" placeholder="2016-11-25T12:01:00">
+				<br>
+				<input type="submit" value="submit">
+    </div>
+
+    {% endblock %}
+    
