@@ -176,14 +176,14 @@ def logout(request):
     else:
         return redirect(login)
 
-
-def user(request, username):
+@login_required()
+def accounts(request, username):
     #u = User.find_by_id(int(id))
     #u = User.objects.get(username=username)
     #return redirect('user', username)
     #return render(request, 'index.html')
-    user = CustomUser.objects.get(username=username)
+    user = request.user
     if request.user.is_authenticated():
-        return render(request, 'user.html', {'user' : user})
+        return render(request, 'accounts.html', {'user' : user})
     else: 
         return redirect(login)

@@ -134,4 +134,4 @@ STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
 
 
 
-LOGIN_REDIRECT_URL = '/user/'
+LOGIN_REDIRECT_URL = '/'
