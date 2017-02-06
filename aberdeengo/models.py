@@ -52,7 +52,7 @@ class Event(models.Model):
     description = models.CharField(max_length=255)
     public = models.BooleanField() # default true
     price = models.IntegerField(null=True)
-    #user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, default=1)
 
     tags = set([])
     #cost

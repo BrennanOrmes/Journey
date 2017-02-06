@@ -60,7 +60,7 @@ def event(request,id):
         'scheduled_events' : current_schedule.events()
     })
     return HttpResponse(template.render(context,request))
-
+@login_required
 def addEvent(request):
     if request.method == "POST":
         # TODO: check fields
@@ -69,10 +69,12 @@ def addEvent(request):
         description = request.POST.get('description','')
         start_time = date(request.POST.get('startdate',''))
         end_time = date(request.POST.get('enddate',''))
+        currentUsername = request.user.username
+        user = CustomUser.objects.get(username=currentUsername)
         tags = []
         cost = 0
         public = True
-        e = Event(title=title, start_time=start_time, end_time=end_time, location=location, description=description, public=public, price=cost)
+        e = Event(title=title, start_time=start_time, end_time=end_time, location=location, description=description, public=public, price=cost, user=user)
         e.save()
         return redirect('event', e.id)
     else:
@@ -182,8 +184,10 @@ def accounts(request, username):
     #u = User.objects.get(username=username)
     #return redirect('user', username)
     #return render(request, 'index.html')
-    user = request.user
+    currentUsername = request.user.username
+    currentUser = CustomUser.objects.get(username=currentUsername)
+    event = Event.objects.get(user=currentUser)
     if request.user.is_authenticated():
-        return render(request, 'accounts.html', {'user' : user})
+        return render(request, 'accounts.html', {'user' : currentUser, 'event' : event})
     else: 
         return redirect(login)
