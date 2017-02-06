@@ -1,12 +1,10 @@
 from django.db import models
+from django.contrib.auth.models import User
+#from .validators import UnicodeUsernameValidator
 
-class User(models.Model):
-    email = models.CharField(max_length=255, unique=True)
-    username = models.CharField(max_length=255, unique=True)
-    password = models.CharField(max_length=255)
+class CustomUser(User):
+  #  username_validator = UnicodeUsernameValidator()
     payment = models.CharField(max_length=255)
-
-    
 
 class Location(models.Model):
     coordinates = models.FloatField(max_length=20) #momentarily not used
@@ -59,6 +57,7 @@ class Event(models.Model):
     tags = set([])
     #cost
     # owner
+    #wtf?? why are there two events classes????? <3 ruben
 
     def customise(self, start_time=False, end_time=False, transport=False):
         """Returns a customised object for this event"""
