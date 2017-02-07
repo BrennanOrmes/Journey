@@ -1,9 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import User
-#from .validators import UnicodeUsernameValidator
+import datetime
+
 
 class CustomUser(User):
-  #  username_validator = UnicodeUsernameValidator()
     payment = models.CharField(max_length=255)
 
 class Location(models.Model):
@@ -52,7 +52,8 @@ class Event(models.Model):
     description = models.CharField(max_length=255)
     public = models.BooleanField() # default true
     price = models.IntegerField(null=True)
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, default=1)
+    user = models.ForeignKey
+  #  publication_date = models.DateField(("Date"), default=datetime.date.today)
 
     tags = set([])
     #cost

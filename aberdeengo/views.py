@@ -136,8 +136,13 @@ def logout(request):
 def accounts(request, username):
     currentUsername = request.user.username
     currentUser = CustomUser.objects.get(username=currentUsername)
-    event = Event.objects.get(user=currentUser)
+    events = Event.objects.filter(user=currentUser).order_by('title') 
+    context = {
+        'user': currentUser,
+        'events': events
+    }
     if request.user.is_authenticated():
-        return render(request, 'accounts.html', {'user' : currentUser, 'event' : event})
+        template = loader.get_template('accounts.html')
+        return HttpResponse(template.render(context, request))
     else: 
         return redirect(login)
