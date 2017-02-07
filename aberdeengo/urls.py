@@ -16,6 +16,8 @@ Including another URLconf
 """
 from django.conf.urls import url, patterns, include
 from django.contrib import admin
+from django.views.generic.detail import DetailView
+from models import CustomUser
 
 urlpatterns = patterns('',
     # Examples:
@@ -28,10 +30,11 @@ urlpatterns = patterns('',
     url(r'^search/$','aberdeengo.views.searchEvents', name='search'),
     url(r'^contact/$','aberdeengo.views.contact', name='contact'),
     url(r'^schedule/$','aberdeengo.views.schedule', name='schedule'),
-    url(r'^event/([0-9]+)$','aberdeengo.views.event', name='event'),
+    url(r'^event/([0-9]+)$','aberdeengo.views.event', name='event'), #TODO: change urls to event/eventname+number
     url(r'^addevent/','aberdeengo.views.addEvent', name='addevent'),
     url(r'^scheduleevent/','aberdeengo.views.schedule_event', name='scheduleevent'),
     url(r'^signup/','aberdeengo.views.signup', name='signup'),
-    url(r'^login/','aberdeengo.views.login', name='login'),
-    url(r'^user/([0-9]+)$','aberdeengo.views.user', name='user'),
+    url('^accounts/', include('django.contrib.auth.urls')),
+    url(r'^accounts/(?P<username>\w+)/$','aberdeengo.views.accounts', name='accounts'),
+   # url(r'^accounts/(?P<username>\w+)/$', DetailView.as_view(model=CustomUser)),
 )

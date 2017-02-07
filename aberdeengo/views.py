@@ -1,11 +1,22 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.template import loader, RequestContext
 from django.core.urlresolvers import reverse
 from scripts.event import Event
 from scripts.schedule import Schedule, EventsClash
 from scripts.test import current_schedule, user_tags, date
-from .models import User
+from .models import CustomUser
+
+
+from scripts.signup import *
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_protect
+from django.shortcuts import render_to_response
+from django.template import RequestContext
+
+from django.contrib import messages
+from django.http import Http404
+
 
 # Create your views here.
 
@@ -85,26 +96,94 @@ def schedule_event(request):
     else:
         raise Http404("Page not found")
         
+# def signup(request):
+#     if request.method == "POST":
+#         # TODO: check fields
+#         email = request.POST.get('email','')
+#         username = request.POST.get('username','')
+#         password1 = request.POST.get('password1','')
+#         password2 = request.POST.get('password2','')
+#         if password1 == password2:
+#             u = CustomUser(email=email,username=username, password=password1,payment="paypal")
+#             u.save()
+#             return redirect('contact')
+#         else:
+#             return redirect('signup')
+#     else:
+#         template = loader.get_template('signup.html')
+#         context = RequestContext(request,{})
+#         return HttpResponse(template.render(context,request))
+
 def signup(request):
-    if request.method == "POST":
-        # TODO: check fields
-        email = request.POST.get('email','')
-        username = request.POST.get('username','')
-        password1 = request.POST.get('password1','')
-        password2 = request.POST.get('password2','')
-        if password1 == password2:
-            u = User(email=email,username=username, password=password1,payment="paypal")
-            u.save()
-            return redirect('contact')
+    if request.method == 'POST':
+        form = RegistrationForm(request.POST)
+        if form.is_valid():
+            user = CustomUser.objects.create_user(
+            username=form.cleaned_data['username'],
+            password=form.cleaned_data['password1'],
+            email=form.cleaned_data['email'],
+            payment = 'none'
+            )
+            return redirect('login')
         else:
-            return redirect('signup')
+            messages.error(request, "Error")
     else:
         template = loader.get_template('signup.html')
-        context = RequestContext(request,{})
-        return HttpResponse(template.render(context,request))
+        form = RegistrationForm()
+    variables = RequestContext(request, {
+    'form': form
+    })
+ 
+    return render_to_response(
+    'signup.html',
+    variables,
+    )
     
-def login(request):
-    return render(request,'login.html')
+
+from django.contrib.auth import authenticate
+from django.contrib import auth
+# user = authenticate(username='john', password='secret')
+# if user is not None:
+#     # A backend authenticated the credentials
+# else:
+#     # No backend authenticated the credential
+# and not request.user.is_authenticated()
+  
+# def login(request):
+#     if request.method == 'POST':
+#         u = request.POST.get('username','')
+#         p = request.POST.get('password','')
+#         user = authenticate(username=u, password=p)
+#         if user is not None:
+#             auth.login(request, user)
+#             #return redirect('contact')
+#             return redirect('user', user.username) #this will redirect you to your account page once you log in
+#         else:
+#             return redirect('signup')   
+#     else:
+#             if request.user.is_authenticated():
+#                  return render(request,'logout.html')
+#             else:
+#                 return render(request,'login.html')
+                
+def logout(request):
+    if request.method == 'POST':
+        auth.logout(request)
+        return render(request,'index.html')
     
-def user(request):
-    return render(request, 'user.html')
+    elif request.user.is_authenticated():
+        return render(request,'logout.html')
+    else:
+        return redirect(login)
+
+@login_required()
+def accounts(request, username):
+    #u = User.find_by_id(int(id))
+    #u = User.objects.get(username=username)
+    #return redirect('user', username)
+    #return render(request, 'index.html')
+    user = request.user
+    if request.user.is_authenticated():
+        return render(request, 'accounts.html', {'user' : user})
+    else: 
+        return redirect(login)

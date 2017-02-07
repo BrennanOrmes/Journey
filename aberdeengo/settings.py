@@ -33,13 +33,13 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 # Application definition
 
 INSTALLED_APPS = [
+    'aberdeengo',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'aberdeengo',
     'gunicorn',
     'geopy',
 ]
@@ -131,3 +131,7 @@ STATICFILES_DIRS = (
     )
 
 STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
+
+
+
+LOGIN_REDIRECT_URL = '/'
