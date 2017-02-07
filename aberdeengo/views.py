@@ -136,7 +136,7 @@ def logout(request):
 def accounts(request, username):
     currentUsername = request.user.username
     currentUser = CustomUser.objects.get(username=currentUsername)
-    events = Event.objects.filter(user=currentUser).order_by('title') 
+    events = Event.objects.filter(user=currentUser).order_by('publication_date') 
     context = {
         'user': currentUser,
         'events': events

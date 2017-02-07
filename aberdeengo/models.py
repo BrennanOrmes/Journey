@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+import datetime
 
 class CustomUser(User):
     payment = models.CharField(max_length=255)
@@ -51,7 +52,7 @@ class Event(models.Model):
     public = models.BooleanField() # default true
     price = models.IntegerField(null=True)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, default=1)
-    #  publication_date = models.DateField(("Date"), default=datetime.date.today)
+    publication_date = models.DateField(("Date"), default=datetime.date.today)
 
     tags = set([])
     #cost
