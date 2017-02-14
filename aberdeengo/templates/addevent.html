@@ -6,13 +6,13 @@
    
     
         <h2>Event Information</h2>
-        <form action="{% url 'addevent'%}" method="post">
+        <form id="formA" action="{% url 'addevent'%}" method="post">
             {% csrf_token %}
             <label for="title">Event Name</label>
 				<input type="text" id="title" name="title" placeholder="Your Event">
 				<br>
 				<label for="title">Event Location</label>
-				<input type="text" id="location" name="location" placeholder="Your Location">
+				<input type="hidden" id="location" name="location" placeholder="Your Location">
 				<div id="map" style="width:100%;height:500px;"></div>
 
         <script>
@@ -26,6 +26,7 @@
           var map = new google.maps.Map(mapCanvas, mapOptions);
           google.maps.event.addListener(map, 'click', function(event) {
             placeMarker(map, event.latLng);
+            document.forms['formA'].elements['location'].value = event.latLng;
           });
         }
         
@@ -44,6 +45,8 @@
           infowindow.open(map,marker);
         }
         
+        
+        
         function clearOverlays() {
           for (var i = 0; i < markersArray.length; i++ ) {
             markersArray[i].setMap(null);
@@ -52,7 +55,8 @@
           markersArray = [];
         }
         </script>
-				  
+        
+      
 		<script src="https://maps.googleapis.com/maps/api/js?callback=myMap"></script>
     <!-- <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyClKcWsgdYmlnLItSUiD5YaJgbrD9ahed4&callback=initMap">
     </script> -->
