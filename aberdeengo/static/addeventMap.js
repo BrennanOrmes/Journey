@@ -1,19 +1,4 @@
-{% extends "layout.html" %}
-{% block content %}
-
-        <h2>Event Information</h2>
-        <form id="formA" action="{% url 'addevent'%}" method="post">
-            {% csrf_token %}
-            <label for="title">Event Name</label>
-				<input type="text" id="title" name="title" placeholder="Your Event">
-				<br>
-				<label for="title">Event Location - <i>Click where your event will be held</i></label>
-				<input type="hidden" id="location" name="location" placeholder="Your Location">
-				<div id="map" style="width:100%;height:500px;"></div>
-
-        <script>
-        
-        var markersArray = []; // A 1D Array for holding one marker.
+var markersArray = []; // A 1D Array for holding one marker.
         
         function initMap() {
           var map = new google.maps.Map(document.getElementById('map'), {
@@ -77,24 +62,3 @@
           markersArray.length = 0;
           markersArray = [];
         }
-        </script>
-				  
-		<script src="https://maps.googleapis.com/maps/api/js?callback=myMap"></script>
-		
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key={{API_Key}}&callback=initMap">
-    </script>
-    
-				<br>
-				<label for="title">Event Description</label>
-				<input type="text" id="description" name="description" placeholder="What your event is about">
-				<br>
-				<label for="title">Event Start Date</label>
-				<input type="text" id="startdate" name="startdate" placeholder="2016-11-25T12:00:00">
-				<br>
-				<label for="title">Event End Date</label>
-				<input type="text" id="enddate" name="enddate" placeholder="2016-11-25T12:01:00">
-				<br>
-				<input type="submit" value="submit">
-    </div>
-
-    {% endblock %}
