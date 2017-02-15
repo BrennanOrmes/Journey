@@ -28,7 +28,7 @@ def searchEvents(request):
     template = loader.get_template('search.html')
     context = {
         'events': events,
-        'scheduled_events' : current_schedule.events()
+        'scheduled_events' : current_schedule.scheduled_events()
     }
     return HttpResponse(template.render(context,request))
     
@@ -52,7 +52,7 @@ def event(request,id):
     context = RequestContext(request, {
         'events': [event],
         'clashes' : clashes,
-        'scheduled_events' : current_schedule.events()
+        'scheduled_events' : current_schedule.scheduled_events()
     })
     return HttpResponse(template.render(context,request))
 @login_required
