@@ -24,23 +24,5 @@
     <input type="submit" value="Add to Schedule" /> {% endif %}
   </form>
 </div>
-<div class="col-xs-6 col-lg-8">
-  <h3>My Google Maps Demo</h3>
-  <div id="map" style="width:100%;height:500px"></div>
-  <script>
-    function myMap() {
-      var mapCanvas = document.getElementById("map");
-      var mapOptions = {
-        center: new google.maps.LatLng(57.164336, -2.104718),
-        zoom: 5
-      }
-      var map = new google.maps.Map(mapCanvas, mapOptions);
-    }
-  </script>
 
-  <script src="https://maps.googleapis.com/maps/api/js?callback=myMap"></script>
-  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyClKcWsgdYmlnLItSUiD5YaJgbrD9ahed4&callback=initMap">
-  </script>
-
-</div>
 {% endfor %} {%endblock %}
