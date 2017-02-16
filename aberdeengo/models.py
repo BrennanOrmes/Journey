@@ -6,6 +6,8 @@ from datetime import datetime, timedelta
 class CustomUser(User):
   #  username_validator = UnicodeUsernameValidator()
     payment = models.CharField(max_length=255)
+    # 'Schedule' needs to be the class name rather than the object to prevent errors
+    schedule = models.OneToOneField('Schedule', null=True) # null is temporary
 
 class Location(models.Model):
     coordinates = models.FloatField(max_length=20) #momentarily not used

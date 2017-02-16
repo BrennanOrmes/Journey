@@ -8,7 +8,7 @@ from django.contrib.auth.decorators import login_required
 
 from scripts.event import Event
 from scripts.schedule import Schedule, EventsClash
-from scripts.test import current_schedule, user_tags, date
+from scripts.test import user_tags, date
 from scripts.signup import *
 
 from .models import CustomUser
@@ -26,16 +26,23 @@ def searchEvents(request):
     events = Event.search(search_string, user_tags) #TODO: add limiting
     events.sort(key=lambda x: x.start_time)
     template = loader.get_template('search.html')
+    if request.user.is_anonymous():
+        scheduled_events = []
+    else:
+        user = CustomUser.objects.get(username=request.user.username)
+        scheduled_events = user.schedule.scheduled_events()
     context = {
         'events': events,
-        'scheduled_events' : current_schedule.scheduled_events()
+        'scheduled_events' : scheduled_events
     }
     return HttpResponse(template.render(context,request))
-    
+
+@login_required
 def schedule(request):
     template = loader.get_template('schedule.html')
+    user = CustomUser.objects.get(username=request.user.username)
     context = RequestContext(request, {
-        'schedule' : current_schedule
+        'schedule' : user.schedule
     })
     return HttpResponse(template.render(context,request))
     
@@ -49,10 +56,15 @@ def event(request,id):
     
     template = loader.get_template('search.html')
     # Will need to split out the veent part of the search template so that we don't get "clashes" appearing everywhere
+    if request.user.is_anonymous():
+        scheduled_events = []
+    else:
+        user = CustomUser.objects.get(username=request.user.username)
+        scheduled_events = user.schedule.scheduled_events()
     context = RequestContext(request, {
         'events': [event],
         'clashes' : clashes,
-        'scheduled_events' : current_schedule.scheduled_events()
+        'scheduled_events' : scheduled_events
     })
     return HttpResponse(template.render(context,request))
 @login_required
@@ -77,18 +89,20 @@ def addEvent(request):
         context = RequestContext(request,{})
         return HttpResponse(template.render(context,request))
 
+@login_required
 def schedule_event(request):
+    user = CustomUser.objects.get(username=request.user.username)
     if request.method == "POST":
         event_id = int(request.POST.get('event_id'))
         event = Event.find_by_id(event_id)
         if request.POST.get('schedule') == '1':
             try:
-                current_schedule.add_event(event)
+                user.schedule.add_event(event)
                 return redirect('schedule')
             except EventsClash as e:
                 return redirect(reverse('event', args=[event_id]) + '?clash={}'.format(e.e2.id)) # hack
         else:
-            current_schedule.remove_event(event)
+            user.schedule.remove_event(event)
             return redirect('schedule')
     else:
         raise Http404("Page not found")
@@ -97,11 +111,14 @@ def signup(request):
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
         if form.is_valid():
+            s = Schedule()
+            s.save()
             user = CustomUser.objects.create_user(
             username=form.cleaned_data['username'],
             password=form.cleaned_data['password1'],
             email=form.cleaned_data['email'],
-            payment = 'none'
+            payment = 'none',
+            schedule = s
             )
             return redirect('login')
         else:
