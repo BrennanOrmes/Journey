@@ -117,10 +117,6 @@ def signup(request):
     'signup.html',
     variables,
     )
-    
-
-
-
 
 def logout(request):
     if request.method == 'POST':
@@ -146,3 +142,5 @@ def accounts(request, username):
         return HttpResponse(template.render(context, request))
     else: 
         return redirect(login)
+    
+    

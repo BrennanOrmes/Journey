@@ -18,11 +18,10 @@ from django.conf.urls import url, patterns, include
 from django.contrib import admin
 from django.views.generic.detail import DetailView
 from models import CustomUser
+from . import views
 
 urlpatterns = patterns('',
-    # Examples:
-    # url(r'^$', 'perfumes.views.home', name='home'),
-    # url(r'^blog/', include('blog.urls')),
+
 
     url(r'^admin/', include(admin.site.urls)),
     url(r'^$','aberdeengo.views.home', name='home'),
@@ -36,5 +35,6 @@ urlpatterns = patterns('',
     url(r'^signup/','aberdeengo.views.signup', name='signup'),
     url('^accounts/', include('django.contrib.auth.urls')),
     url(r'^accounts/(?P<username>\w+)/$','aberdeengo.views.accounts', name='accounts'),
+
    # url(r'^accounts/(?P<username>\w+)/$', DetailView.as_view(model=CustomUser)),
 )
