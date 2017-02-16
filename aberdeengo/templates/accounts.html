@@ -2,5 +2,15 @@
 {% block content %}
 
     <h2>Welcome, {{user.username}}!</h2>
-
+    <h2>your created events </h2>
+    
+    
+    </br>
+    <h4>
+   <ul>
+    {% for e in events %}
+        <li>{{ e.title }}</li> </br>
+    {% endfor %}
+    </ul>
+   </h4>
 {% endblock %}
