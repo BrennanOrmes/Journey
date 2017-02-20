@@ -8,7 +8,7 @@ from datetime import datetime
 def date(s):
     return datetime.strptime(s,"%Y-%m-%dT%H:%M:%S")
 
-#test commit
+
 # Test Data
 """
 e1 = Event(title=u"Prototype Hackathon",
