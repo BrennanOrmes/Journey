@@ -8,7 +8,7 @@ from datetime import datetime
 def date(s):
     return datetime.strptime(s,"%Y-%m-%dT%H:%M:%S")
 
-#test commit
+
 # Test Data
 """
 e1 = Event(title=u"Prototype Hackathon",
@@ -59,11 +59,13 @@ e5 = Event(title=u"Operating Systems Hackathon",
            )
 """
 
-e1, e2, e3, e4, e5 = Event.objects.all()[:5]
-
+# e1, e2, e3, e4, e5 = Event.objects.all()[:5]
+current_schedule = Schedule.objects.get(pk=5)
+"""
 current_schedule = Schedule()
+current_schedule.save()
 current_schedule.add_event(e2)
 current_schedule.add_event(e3)
 current_schedule.add_event(e4)
-
+"""
 user_tags = []

@@ -1,10 +1,12 @@
 from django.db import models
 from django.contrib.auth.models import User
+import datetime
 #from .validators import UnicodeUsernameValidator
 
 class CustomUser(User):
-  #  username_validator = UnicodeUsernameValidator()
     payment = models.CharField(max_length=255)
+    # 'Schedule' needs to be the class name rather than the object to prevent errors
+    schedule = models.OneToOneField('Schedule', null=True) # null is temporary
 
 class Location(models.Model):
     coordinates = models.FloatField(max_length=20) #momentarily not used
@@ -52,7 +54,8 @@ class Event(models.Model):
     description = models.CharField(max_length=255)
     public = models.BooleanField() # default true
     price = models.IntegerField(null=True)
-    #user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, default=1)
+    publication_date = models.DateField(("Date"), default=datetime.date.today)
 
     tags = set([])
     #cost
@@ -99,6 +102,58 @@ class Event(models.Model):
         """Checks if this event overlaps with another event"""
         return (between(self.start_time, other.start_time, self.end_time)
                 or between(other.start_time, self.start_time, other.end_time))
+
+
+class Schedule(models.Model):
+    events = models.ManyToManyField(Event)
+    # event = models.ForeignKey(Events, on_delete=models.CASCADE)
+    # user = models.ForeignKey(User, on_delete=models.CASCADE)
+    # start = models.TimeField()
+    # end = models.TimeField()
+
+    def add_event(self, event):
+        """Add an event to this schedule if possible. If it cannot be added,
+        an EventsClash exception is thrown"""
+        events = self.events.all()
+
+        if event in events:
+            return
+
+        for e in events:
+            if event.clashes_with(e):
+                raise EventsClash(event, e)
+
+        self.events.add(event)
+
+    def remove_event(self, event):
+        """Removes an event from this schedule"""
+        self.events.remove(event)
+        # delete without an exception on fail
+
+    def events_in_range(self, start, end):
+        """Returns the events scheduled between the start and end dates"""
+        return [event for event in self.events.all() if event.in_range(start, end)]
+
+    def current_event(self):
+        now = datetime.datetime.now()
+        delta = datetime.timedelta(seconds=1)
+        events = self.events_in_range(now, now + delta)
+        if events == []:
+            return False
+        else:
+            return events[0]
+
+    def scheduled_events(self):
+        """Returns a list of all the events in this schedule"""
+        # TODO: should we be deleting events that have already passed?
+        return sorted(self.events.all(), key=lambda x: x.start_time)
+
+
+class EventsClash(Exception):
+    def __init__(self, e1, e2):
+        self.e1 = e1
+        self.e2 = e2
+
 
 def between(x, y, z):
     "Returns true if x <= y <= z"

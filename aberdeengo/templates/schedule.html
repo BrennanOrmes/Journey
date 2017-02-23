@@ -3,7 +3,7 @@
         <h1>Schedule</h1>
         <ul>
         {# FIXME: this shows all events even those that are past #}
-        {% for event in schedule.events %}
+        {% for event in schedule.scheduled_events %}
         <div class="col-xs-6 col-lg-4">
         <h2><a href="{% url 'event' event.id %}">{{event.title}}</a></h2>
         <p>From: {{ event.start_time|date:"D d M Y P" }}</p>
