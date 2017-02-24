@@ -161,3 +161,11 @@ def accounts(request, username):
         return redirect(login)
     
     
+def editAccount(request):
+    return render(request,'ajax/profile.html')
+
+def ownedEvents(request):
+    return render(request,'ajax/events.html')
+    
+def interests(request):
+    return render(request,'ajax/interests.html')

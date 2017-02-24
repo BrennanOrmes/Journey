@@ -35,6 +35,9 @@ urlpatterns = patterns('',
     url(r'^signup/','aberdeengo.views.signup', name='signup'),
     url('^accounts/', include('django.contrib.auth.urls')),
     url(r'^accounts/(?P<username>\w+)/$','aberdeengo.views.accounts', name='accounts'),
+    url(r'^editAccount/$','aberdeengo.views.editAccount', name='editAccount'),
+    url(r'^interests/$','aberdeengo.views.interests', name='interests'),
+    url(r'^ownedEvents/$','aberdeengo.views.ownedEvents', name='ownedEvents'),
 
    # url(r'^accounts/(?P<username>\w+)/$', DetailView.as_view(model=CustomUser)),
 )
