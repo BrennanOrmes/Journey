@@ -110,6 +110,7 @@ def schedule_event(request):
 def signup(request):
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
+      
         if form.is_valid():
             s = Schedule()
             s.save()
@@ -120,7 +121,10 @@ def signup(request):
             payment = 'none',
             schedule = s
             )
-            return redirect('login')
+            
+            #have user login after sign up
+            #user = authenticate(username=user.username, password=user.password)
+            return redirect('home')
         else:
             messages.error(request, "Error")
     else:
@@ -165,7 +169,14 @@ def editAccount(request):
     return render(request,'ajax/profile.html')
 
 def ownedEvents(request):
-    return render(request,'ajax/events.html')
+    currentUsername = request.user.username
+    currentUser = CustomUser.objects.get(username=currentUsername)
+    events = Event.objects.filter(user=currentUser).order_by('publication_date') 
+    context = {
+        'events': events
+    }
+    template = loader.get_template('ajax/events.html')
+    return HttpResponse(template.render(context, request))
     
 def interests(request):
     return render(request,'ajax/interests.html')
