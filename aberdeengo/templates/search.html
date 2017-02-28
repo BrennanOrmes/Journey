@@ -72,6 +72,10 @@
     <input type="hidden" name="event_id" value="{{ event.id }}" /> {% if event in scheduled_events %}
     <input type="hidden" name="schedule" value="0" />
     <input type="submit" value="Remove from Schedule" /> {% elif not clashes %}
+    <label for="title">Going from:</label>
+				<input type="text" id="new_start_time" name="new_start_time" placeholder="2016-11-25T12:00:00">
+    <label for="title">Leaving at:</label>
+				<input type="text" id="new_end_time" name="new_end_time" placeholder="2016-11-25T12:00:00">
     <input type="hidden" name="schedule" value="1" />
     <input type="submit" value="Add to Schedule" /> {% endif %}
   </form>

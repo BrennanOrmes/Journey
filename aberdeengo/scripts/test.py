@@ -6,7 +6,7 @@ from datetime import datetime
 #from .models import Events
 
 def date(s):
-    return datetime.strptime(s,"%Y-%m-%dT%H:%M:%S")
+    return datetime.strptime(s+"-UTC","%Y-%m-%dT%H:%M:%S-%Z")
 
 
 # Test Data

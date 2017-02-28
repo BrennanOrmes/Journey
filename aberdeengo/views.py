@@ -7,7 +7,7 @@ from django.contrib import auth
 from django.contrib.auth.decorators import login_required
 
 from scripts.event import Event
-from scripts.schedule import Schedule, EventsClash
+from scripts.schedule import Schedule, EventsClash, InconsistentTime
 from scripts.test import user_tags, date
 from scripts.signup import *
 
@@ -97,9 +97,11 @@ def schedule_event(request):
         event = Event.find_by_id(event_id)
         if request.POST.get('schedule') == '1':
             try:
-                user.schedule.add_event(event)
+                new_start_time = date(request.POST.get('new_start_time',''))
+                new_end_time = date(request.POST.get('new_end_time',''))
+                user.schedule.add_event(event, new_start_time, new_end_time)
                 return redirect('schedule')
-            except EventsClash as e:
+            except (EventsClash, InconsistentTime) as e:
                 return redirect(reverse('event', args=[event_id]) + '?clash={}'.format(e.e2.id)) # hack
         else:
             user.schedule.remove_event(event)

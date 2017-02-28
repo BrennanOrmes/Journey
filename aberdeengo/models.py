@@ -111,14 +111,32 @@ class Schedule(models.Model):
     # start = models.TimeField()
     # end = models.TimeField()
 
-    def add_event(self, event):
+    def add_event(self, event, new_start_time, new_end_time):
         """Add an event to this schedule if possible. If it cannot be added,
         an EventsClash exception is thrown"""
         events = self.events.all()
-
+        newevent = event
+        newevent.start_time = new_start_time
+        newevent.end_time = new_end_time
+        
         if event in events:
             return
-
+        
+        """if event.clashes_with(newevent):
+            raise InconsistentTime(event, newevent)
+        else:
+            event = newevent
+        """
+        
+        if new_start_time >= event.start_time:
+            if new_end_time <= event.end_time:
+                event.end_time = new_end_time
+                event.start_time = new_start_time
+            else:
+                InconsistentTime(event, event)
+        else:
+            InconsistentTime(event, newevent)
+        
         for e in events:
             if event.clashes_with(e):
                 raise EventsClash(event, e)
@@ -155,6 +173,11 @@ class EventsClash(Exception):
         self.e2 = e2
 
 
+class InconsistentTime(Exception):
+    def __init__(self,e1,e2):
+        self.e1 = e1
+        self.e2 = e2
+
 def between(x, y, z):
     "Returns true if x <= y <= z"
-    return (x <= y) and (y <= z)
+    return (x < y) and (y < z)
