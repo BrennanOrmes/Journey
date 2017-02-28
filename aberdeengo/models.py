@@ -12,6 +12,10 @@ class Location(models.Model):
     opentime = models.TimeField(null=True)
     closedtime = models.TimeField(null=True)
 
+class Tag(models.Model):
+    name = models.CharField(max_length=255)
+    description = models.CharField(max_length=255)
+
 class Events(models.Model):
     name = models.CharField(max_length=255)
     start = models.DateTimeField()
@@ -20,10 +24,9 @@ class Events(models.Model):
     public = models.BooleanField()
     price = models.IntegerField(null=True)
     #user = models.ForeignKey(User, on_delete=models.CASCADE)
+    tags = models.ManyToManyField(Tag)
     
-class Tag(models.Model):
-    name = models.CharField(max_length=255)
-    description = models.CharField(max_length=255)
+
 
 class Interests(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

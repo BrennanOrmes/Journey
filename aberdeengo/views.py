@@ -5,7 +5,7 @@ from django.core.urlresolvers import reverse
 from scripts.event import Event
 from scripts.schedule import Schedule, EventsClash
 from scripts.test import current_schedule, user_tags, date
-from .models import CustomUser
+from .models import CustomUser, Tag
 
 
 from scripts.signup import *
@@ -69,15 +69,18 @@ def addEvent(request):
         description = request.POST.get('description','')
         start_time = date(request.POST.get('startdate',''))
         end_time = date(request.POST.get('enddate',''))
-        tags = []
+        tags = request.POST.get('tags',[])
         cost = 0
         public = True
-        e = Event(title=title, start_time=start_time, end_time=end_time, location=location, description=description, public=public, price=cost)
+        e = Event(title=title, start_time=start_time, end_time=end_time, location=location, description=description, public=public, price=cost, tags=tags)
         e.save()
         return redirect('event', e.id)
     else:
+        tags = Tag.objects.all()
         template = loader.get_template('addevent.html')
-        context = RequestContext(request,{})
+        context = RequestContext(request,{
+            'tags': tags
+        })
         return HttpResponse(template.render(context,request))
 
 def schedule_event(request):

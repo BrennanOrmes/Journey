@@ -66,8 +66,14 @@
 				<label for="title">Event End Date</label>
 				<input type="text" id="enddate" name="enddate" placeholder="2016-11-25T12:01:00">
 				<br>
+				{% for tag in tags %}
+				<label>
+				  <input type="checkbox" name="tags">{{tag.name}}
+				</label>
+				{% endfor %}
+				<br>
 				<input type="submit" value="submit">
     </div>
 
-    {% endblock %}
+  {% endblock %}
     
