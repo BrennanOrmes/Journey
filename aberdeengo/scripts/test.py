@@ -3,10 +3,13 @@ from __future__ import unicode_literals
 from schedule import Schedule
 from event import Event
 from datetime import datetime
+import pytz
 #from .models import Events
 
 def date(s):
-    return datetime.strptime(s+"-UTC","%Y-%m-%dT%H:%M:%S-%Z")
+    unaware = datetime.strptime(s,"%Y-%m-%dT%H:%M:%S")
+    now_aware = pytz.utc.localize(unaware)
+    return now_aware
 
 
 # Test Data

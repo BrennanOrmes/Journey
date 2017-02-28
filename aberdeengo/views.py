@@ -99,7 +99,10 @@ def schedule_event(request):
             try:
                 new_start_time = date(request.POST.get('new_start_time',''))
                 new_end_time = date(request.POST.get('new_end_time',''))
-                user.schedule.add_event(event, new_start_time, new_end_time)
+                currentUsername = request.user.username
+                user = CustomUser.objects.get(username=currentUsername)
+                newentry = ScheduleEntry(event = event, user = user, start = new_start_time, end = new_end_time)
+                user.schedule.add_event(event, newentry)
                 return redirect('schedule')
             except (EventsClash, InconsistentTime) as e:
                 return redirect(reverse('event', args=[event_id]) + '?clash={}'.format(e.e2.id)) # hack

@@ -39,11 +39,6 @@ class LocationTag(models.Model):
     event = models.ForeignKey(Location, on_delete=models.CASCADE)
     tag = models.ForeignKey(Tag, on_delete=models.CASCADE)
 
-class ScheduleEntry(models.Model):
-    event = models.ForeignKey(Events, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    start = models.TimeField()
-    end = models.TimeField()
 
 
 class Event(models.Model):
@@ -105,43 +100,36 @@ class Event(models.Model):
 
 
 class Schedule(models.Model):
-    events = models.ManyToManyField(Event)
+    #events = models.ManyToManyField(Event)
+    events = models.ManyToManyField(Event, through = 'ScheduleEntry')
     # event = models.ForeignKey(Events, on_delete=models.CASCADE)
     # user = models.ForeignKey(User, on_delete=models.CASCADE)
     # start = models.TimeField()
     # end = models.TimeField()
 
-    def add_event(self, event, new_start_time, new_end_time):
+    def add_event(self, event, newentry):
         """Add an event to this schedule if possible. If it cannot be added,
         an EventsClash exception is thrown"""
         events = self.events.all()
-        newevent = event
-        newevent.start_time = new_start_time
-        newevent.end_time = new_end_time
+        #newevent = event
+        #newevent.start_time = new_start_time
+        #newevent.end_time = new_end_time
         
         if event in events:
             return
         
-        """if event.clashes_with(newevent):
-            raise InconsistentTime(event, newevent)
-        else:
-            event = newevent
-        """
         
-        if new_start_time >= event.start_time:
-            if new_end_time <= event.end_time:
-                event.end_time = new_end_time
-                event.start_time = new_start_time
-            else:
-                InconsistentTime(event, event)
-        else:
-            InconsistentTime(event, newevent)
+        if newentry.start < event.start_time:
+            InconsistentTime(event, event)
+        if newentry.end > event.end_time:
+            InconsistentTime(event, event)
+     
         
         for e in events:
             if event.clashes_with(e):
                 raise EventsClash(event, e)
 
-        self.events.add(event)
+        newentry.save
 
     def remove_event(self, event):
         """Removes an event from this schedule"""
@@ -166,6 +154,11 @@ class Schedule(models.Model):
         # TODO: should we be deleting events that have already passed?
         return sorted(self.events.all(), key=lambda x: x.start_time)
 
+class ScheduleEntry(models.Model):
+    event = models.ForeignKey(Event, on_delete=models.CASCADE)
+    schedule = models.ForeignKey(Schedule, on_delete=models.CASCADE)
+    start = models.TimeField()
+    end = models.TimeField()
 
 class EventsClash(Exception):
     def __init__(self, e1, e2):
