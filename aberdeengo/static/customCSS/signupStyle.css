@@ -1,0 +1,46 @@
+
+
+#top-bar{
+    background-color: white;
+    text-align: center;
+    border: 3px solid #981831;
+    border-bottom: none;
+    border-top-left-radius: 5px;
+     border-top-right-radius: 5px;
+     color: #981831;
+     padding-bottom: 2%;
+     padding-top: 2%;
+}
+
+#signupContent{
+    color:white;
+     background-color: #B81F3B;
+     padding-top: 5%;
+     padding-bottom: 5%;
+     border-bottom: solid;
+     border-bottom-color:  #981831;
+     border-bottom-width: 8px;
+     border-bottom-left-radius: 3%;
+      border-bottom-right-radius: 3%;
+}
+
+form{
+   
+color:black;
+margin-right: auto;
+    text-align: center;
+color:black;
+}
+
+
+p{
+    font-weight: bold;
+    color:white;
+    
+}
+
+input{
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 5px;
+}

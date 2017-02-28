@@ -1,1 +1,15 @@
-<h1> Hello motherfucking interests</h1>
+<h1>interests</h1>
+
+<form id=""  method="post"> {% csrf_token %}
+  <p> Choose your interest</p>
+    <select multiple name="interests">
+   <option value="food"> food</option>
+     <option value="games"> games</option>
+    <option value="orgies">orgies </option>
+     <option value="nature"> nature</option>
+     <option value="culture"> culture</option>
+    <option value="comedy">comedy</option>
+    <option value="music">music </option>
+    </select>
+    <input type="submit" value="save"/>
+    </form>

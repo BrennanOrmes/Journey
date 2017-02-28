@@ -1,0 +1,7 @@
+<form id="" action="{% url 'name'%}" method="post"> {% csrf_token %}
+  <p> Enter your firstname</p>
+    <input type="text" name="firstname" maxlength="20" required><br>
+  <p> Enter your surname</p>
+  <input type="text" name="lastname" maxlength="20" required><br>
+    <input type="submit" value="save"/>
+    </form>

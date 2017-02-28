@@ -38,6 +38,9 @@ urlpatterns = patterns('',
     url(r'^editAccount/$','aberdeengo.views.editAccount', name='editAccount'),
     url(r'^interests/$','aberdeengo.views.interests', name='interests'),
     url(r'^ownedEvents/$','aberdeengo.views.ownedEvents', name='ownedEvents'),
-
+    url(r'^name/$','aberdeengo.views.name', name='name'),
+    url(r'^email/$','aberdeengo.views.email', name='email'),
+    url(r'^password/$', views.change_password, name='change_password'),
+    url(r'^addPayment/$', 'aberdeengo.views.addPayment', name='addPayment'),
    # url(r'^accounts/(?P<username>\w+)/$', DetailView.as_view(model=CustomUser)),
 )

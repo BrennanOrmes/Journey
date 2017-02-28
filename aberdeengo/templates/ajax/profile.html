@@ -1,17 +1,45 @@
-<h2> Your profile </h2>
 
-first name - Ernesto
+
+<h2> {{ user.username }}'s profile </h2>
+
+<!--<form method="post" action=".">{% csrf_token %}-->
+<!--        <table border="0">-->
+<!--            {{ form.as_table }}-->
+<!--        </table>-->
+<!--        <input type="submit" value="Register" />-->
+<!--    </form>-->
+
+    
+    <div id="changeField">
+
 <br>
 
-last name - Ernesto
 <br>
 
-email - Ernesto@E.nesto
+<p> name:  
+
+{% if user.first_name == "" %}
+     <input type="submit" value="Add" id="nameButton" data="{% url 'name' %}"/></p>  
+{% else %}
+    {{ user.first_name }} {{ user.last_name}} <input type="submit" value="change" id="nameButton" data="{% url 'name' %}"/></p> 
+{% endif %} 
+
+
+email: {{ user.email }}  <input id="mailButton" type="submit" value="change" data="{% url 'email' %}" />
 <br> 
 
-change password - ILoveErnesto
+change password: <input id="passwordButton" type="submit" value="change"  data="{% url 'change_password' %}"/>
 <br>
 
-add payment - motherfucking ccaaassshhhhh
-<br>
 
+<br>
+{% if user.payment == "" %}
+    add payment: <input id="paymentButton" type="submit" value="add"  data="{% url 'addPayment' %}"/>
+{% else %}
+   payment method: {{ user.payment }}  <input id="paymentButton" type="submit" value="change"  data="{% url 'addPayment' %}"/>
+{% endif %} 
+
+</div>
+
+{% load static %}
+    <script src="{% static "editScript.js" %}"></script>

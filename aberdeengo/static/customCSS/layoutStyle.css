@@ -1,0 +1,21 @@
+.jumbotron{
+	visibility: none;
+	/*background-color:  #89B7B5;*/
+}
+
+#navbar{
+  text-align: center;
+}
+
+#content{
+    width: 100%;
+    /*background-color:  #89B7B5;*/
+    min-height: 800px;
+}
+
+
+.main{
+	/*background-color: #89B7B5;*/
+	
+}
+

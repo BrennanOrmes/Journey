@@ -1,5 +1,4 @@
 $("#profile").click(function(event) {
-    event.preventDefault();
     var target = $(this).attr("data");
     $("#main-content").load(target, function() {
          
@@ -7,7 +6,6 @@ $("#profile").click(function(event) {
 });
 
 $("#interests").click(function(event) {
-    event.preventDefault();
     var target = $(this).attr("data");
     $("#main-content").load(target, function() {
         
@@ -15,9 +13,16 @@ $("#interests").click(function(event) {
 });
 
 $("#events").click(function(event) {
-    event.preventDefault();
     var target = $(this).attr("data");
     $("#main-content").load(target, function() {
          
+    });
+});
+
+
+
+$(document).ready(function() {
+ var target = $("#profile").attr("data");
+    $("#main-content").load(target, function() {
     });
 });

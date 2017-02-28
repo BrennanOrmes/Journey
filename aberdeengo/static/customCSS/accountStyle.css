@@ -1,0 +1,27 @@
+li {
+    list-style-type: none;
+   
+}
+
+#user-content{
+        background-color: white;
+    min-height: 700px;
+    margin: 15px;
+
+}
+
+#side-bar{
+    padding-top: 15px;
+  border-right: 5px solid black;
+  height: 700px;
+  text-align: center;
+}
+
+#main-content{
+    min-height: 250px;
+}
+
+ul{
+    
+    padding: none;
+}

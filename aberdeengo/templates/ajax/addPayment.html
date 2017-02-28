@@ -1,0 +1,9 @@
+<form id="" action="{% url 'addPayment'%}" method="post"> {% csrf_token %}
+  <p> Pick a payment option</p>
+    <select name="payment">
+   <option value="paypal"> paypal</option>
+     <option value="debit card"> debit card</option>
+    <option value="credit card">credit card </option>
+    </select>
+    <input type="submit" value="save"/>
+    </form>

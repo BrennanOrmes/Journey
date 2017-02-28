@@ -2,14 +2,18 @@ from django.shortcuts import render, redirect, render_to_response
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.template import loader, RequestContext
 from django.core.urlresolvers import reverse
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, login
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.forms import PasswordChangeForm
 
 from scripts.event import Event
 from scripts.schedule import Schedule, EventsClash
 from scripts.test import user_tags, date
 from scripts.signup import *
+from scripts.profile import *
 
 from .models import CustomUser
 
@@ -119,11 +123,10 @@ def signup(request):
             password=form.cleaned_data['password1'],
             email=form.cleaned_data['email'],
             payment = 'none',
-            schedule = s
+            schedule = s,
             )
-            
-            #have user login after sign up
-            #user = authenticate(username=user.username, password=user.password)
+            user = authenticate(username=form.cleaned_data['username'], password=form.cleaned_data['password1'])
+            login(request, user)
             return redirect('home')
         else:
             messages.error(request, "Error")
@@ -149,7 +152,7 @@ def logout(request):
     else:
         return redirect(login)
 
-@login_required()
+@login_required() 
 def accounts(request, username):
     currentUsername = request.user.username
     currentUser = CustomUser.objects.get(username=currentUsername)
@@ -164,11 +167,18 @@ def accounts(request, username):
     else: 
         return redirect(login)
     
-    
+@login_required()     
 def editAccount(request):
-    return render(request,'ajax/profile.html')
-
-def ownedEvents(request):
+    currentUsername = request.user.username
+    currentUser = CustomUser.objects.get(username=currentUsername)
+    context = {
+        'user': currentUser,
+    }
+    template = loader.get_template('ajax/profile.html')
+    return HttpResponse(template.render(context, request))
+    
+@login_required() 
+def ownedEvents(request): 
     currentUsername = request.user.username
     currentUser = CustomUser.objects.get(username=currentUsername)
     events = Event.objects.filter(user=currentUser).order_by('publication_date') 
@@ -177,6 +187,73 @@ def ownedEvents(request):
     }
     template = loader.get_template('ajax/events.html')
     return HttpResponse(template.render(context, request))
-    
+
+@login_required()     
 def interests(request):
     return render(request,'ajax/interests.html')
+
+@login_required()     
+def name(request):
+    if request.method == 'POST':
+        currentUsername = request.user.username
+        currentUser = CustomUser.objects.get(username=currentUsername)
+        firstname = request.POST.get('firstname','')
+        lastname = request.POST.get('lastname', '')
+        currentUser.first_name = firstname;
+        currentUser.last_name = lastname;
+        currentUser.save();
+        template = loader.get_template('accounts.html')
+        context = {
+        'user': currentUser
+        }
+        return HttpResponse(template.render(context, request))
+    else:
+       return render(request,'ajax/name.html')  
+
+@login_required
+def email(request):
+    if request.method == 'POST':
+        currentUsername = request.user.username
+        currentUser = CustomUser.objects.get(username=currentUsername)
+        email = request.POST.get('email','')
+        currentUser.email = email;
+        currentUser.save();
+        template = loader.get_template('accounts.html')
+        context = {
+        'user': currentUser
+        }
+        return HttpResponse(template.render(context, request))
+    else:
+       return render(request,'ajax/email.html')  
+
+def change_password(request):
+    if request.method == 'POST':
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)  # Important!
+            messages.success(request, 'Your password was successfully updated!')
+            return redirect('accounts:change_password')
+        else:
+            messages.error(request, 'Please correct the error below.')
+    else:
+        form = PasswordChangeForm(request.user)
+    return render(request, 'ajax/changeP.html', {
+        'form': form
+    })
+    
+def addPayment(request):
+    if request.method == 'POST':
+        currentUsername = request.user.username
+        currentUser = CustomUser.objects.get(username=currentUsername)
+        payment = request.POST.get('payment','')
+        currentUser.payment =  payment;
+        currentUser.save();
+        template = loader.get_template('accounts.html')
+        context = {
+        'user': currentUser,
+        'username': currentUser.payment
+        }
+        return HttpResponse(template.render(context, request))
+    else:
+       return render(request,'ajax/addPayment.html')  
