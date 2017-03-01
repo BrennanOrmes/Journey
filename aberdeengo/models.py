@@ -57,7 +57,12 @@ class Event(models.Model):
     price = models.IntegerField(null=True)
     #user = models.ForeignKey(User, on_delete=models.CASCADE)
 
-    tags = set([])
+    #tags = models.ManyToManyField(Tag)
+    eventTags = models.ManyToManyField(Tag)
+    # def add_tags(self, newentry):
+    #     tags = self.tags.all()
+    
+    
     #cost
     # owner
     #wtf?? why are there two events classes????? <3 ruben

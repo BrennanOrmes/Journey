@@ -31,9 +31,12 @@ def searchEvents(request):
     events = Event.search(search_string, user_tags) #TODO: add limiting
     events.sort(key=lambda x: x.start_time)
     template = loader.get_template('search.html')
+    # for event in events:
+    #     tags = event.eventTags.all()
     context = {
         'events': events,
-        'scheduled_events' : current_schedule.events()
+        'scheduled_events' : current_schedule.events(),
+        # 'tags': tags
     }
     return HttpResponse(template.render(context,request))
     
@@ -48,6 +51,7 @@ def schedule(request):
 
 def event(request,id):
     event = Event.find_by_id(int(id))
+    tags = event.eventTags.all()
     clashes = request.GET.get('clash')
     if clashes:
         clashes = Event.find_by_id(int(clashes))
@@ -57,7 +61,8 @@ def event(request,id):
     context = RequestContext(request, {
         'events': [event],
         'clashes' : clashes,
-        'scheduled_events' : current_schedule.events()
+        'scheduled_events' : current_schedule.events(),
+        'tags': tags
     })
     return HttpResponse(template.render(context,request))
 
@@ -69,11 +74,13 @@ def addEvent(request):
         description = request.POST.get('description','')
         start_time = date(request.POST.get('startdate',''))
         end_time = date(request.POST.get('enddate',''))
-        tags = request.POST.getlist('tags',[])
+        tags = request.POST.getlist('tags[]',[])
         cost = 0
         public = True
         e = Event(title=title, start_time=start_time, end_time=end_time, location=location, description=description, public=public, price=cost)
         e.save()
+        for tag in tags:
+             e.eventTags.add(tag)
         return redirect('event', e.id)
     else:
         tags = Tag.objects.all()
