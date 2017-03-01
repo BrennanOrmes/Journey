@@ -69,10 +69,10 @@ def addEvent(request):
         description = request.POST.get('description','')
         start_time = date(request.POST.get('startdate',''))
         end_time = date(request.POST.get('enddate',''))
-        tags = request.POST.get('tags',[])
+        tags = request.POST.getlist('tags',[])
         cost = 0
         public = True
-        e = Event(title=title, start_time=start_time, end_time=end_time, location=location, description=description, public=public, price=cost, tags=tags)
+        e = Event(title=title, start_time=start_time, end_time=end_time, location=location, description=description, public=public, price=cost)
         e.save()
         return redirect('event', e.id)
     else:
