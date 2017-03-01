@@ -3,16 +3,16 @@
         <h1>Schedule</h1>
         <ul>
         {# FIXME: this shows all events even those that are past #}
-        {% for event in schedule.scheduled_events %}
+        {% for part_taking in schedule.scheduled_events %}
         <div class="col-xs-6 col-lg-4">
-        <h2><a href="{% url 'event' event.id %}">{{event.title}}</a></h2>
-        <p>From: {{ event.start_time|date:"D d M Y P" }}</p>
-        <p>To: {{ event.end_time|date:"D d M Y P" }}</p>
-        <p>Description: {{ event.description }}</p>
+        <h2><a href="{% url 'event' part_taking.event.id %}">{{part_taking.event.title}}</a></h2>
+        <p>From: {{ part_taking.start|date:"D d M Y P" }}</p>
+        <p>To: {{ part_taking.end|date:"D d M Y P" }}</p>
+        <p>Description: {{ part_taking.event.description }}</p>
         <p><a class="btn btn-default" href="#" role="button">View Details</a></p>
         <form action="{% url 'scheduleevent' %}" method="post">
         {% csrf_token %}
-        <input type="hidden" name="event_id" value="{{ event.id }}" />
+        <input type="hidden" name="entry_id" value="{{ part_taking.id }}" />
         <input type="hidden" name="schedule" value="0" />
         <input type="submit" value="Remove from Schedule"/>
     </form>

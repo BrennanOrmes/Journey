@@ -11,7 +11,7 @@ from scripts.schedule import Schedule, EventsClash, InconsistentTime
 from scripts.test import user_tags, date
 from scripts.signup import *
 
-from .models import CustomUser
+from .models import CustomUser, ScheduleEntry
 
 # Create your views here. --> WHOOP
 
@@ -52,7 +52,9 @@ def event(request,id):
     event = Event.find_by_id(int(id))
     clashes = request.GET.get('clash')
     if clashes:
-        clashes = Event.find_by_id(int(clashes))
+        clashes = ScheduleEntry.find_by_id(int(clashes)).event
+    inconsistentTime = request.GET.get('inconsistentTime')
+    
     
     template = loader.get_template('search.html')
     # Will need to split out the veent part of the search template so that we don't get "clashes" appearing everywhere
@@ -64,6 +66,7 @@ def event(request,id):
     context = RequestContext(request, {
         'events': [event],
         'clashes' : clashes,
+        'inconsistentTime': inconsistentTime,
         'scheduled_events' : scheduled_events
     })
     return HttpResponse(template.render(context,request))
@@ -93,21 +96,25 @@ def addEvent(request):
 def schedule_event(request):
     user = CustomUser.objects.get(username=request.user.username)
     if request.method == "POST":
-        event_id = int(request.POST.get('event_id'))
-        event = Event.find_by_id(event_id)
         if request.POST.get('schedule') == '1':
             try:
+                event_id = int(request.POST.get('event_id'))
+                event = Event.find_by_id(event_id)
                 new_start_time = date(request.POST.get('new_start_time',''))
                 new_end_time = date(request.POST.get('new_end_time',''))
                 currentUsername = request.user.username
                 user = CustomUser.objects.get(username=currentUsername)
-                newentry = ScheduleEntry(event = event, user = user, start = new_start_time, end = new_end_time)
-                user.schedule.add_event(event, newentry)
+                newentry = ScheduleEntry(event = event, schedule = user.schedule, start = new_start_time, end = new_end_time)
+                user.schedule.add_event(newentry)
                 return redirect('schedule')
-            except (EventsClash, InconsistentTime) as e:
+            except EventsClash as e:
                 return redirect(reverse('event', args=[event_id]) + '?clash={}'.format(e.e2.id)) # hack
+            except InconsistentTime as e:
+                return redirect(reverse('event', args=[event_id]) + '?inconsistentTime={}'.format(e.e2))
         else:
-            user.schedule.remove_event(event)
+            entry_id = int(request.POST.get('entry_id'))
+            entry = ScheduleEntry.find_by_id(entry_id)
+            user.schedule.remove_event(entry)
             return redirect('schedule')
     else:
         raise Http404("Page not found")
