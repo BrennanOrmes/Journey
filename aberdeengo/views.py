@@ -11,7 +11,10 @@ from django.contrib.auth.forms import PasswordChangeForm
 
 from scripts.event import Event
 from scripts.schedule import Schedule, EventsClash
-from scripts.test import user_tags, date
+from scripts.test import current_schedule, user_tags, date
+from .models import CustomUser, Tag
+
+
 from scripts.signup import *
 from scripts.profile import *
 
@@ -30,15 +33,6 @@ def searchEvents(request):
     events = Event.search(search_string, user_tags) #TODO: add limiting
     events.sort(key=lambda x: x.start_time)
     template = loader.get_template('search.html')
-    if request.user.is_anonymous():
-        scheduled_events = []
-    else:
-        user = CustomUser.objects.get(username=request.user.username)
-        scheduled_events = user.schedule.scheduled_events()
-    context = {
-        'events': events,
-        'scheduled_events' : scheduled_events
-    }
     return HttpResponse(template.render(context,request))
 
 @login_required
@@ -54,6 +48,7 @@ def schedule(request):
 
 def event(request,id):
     event = Event.find_by_id(int(id))
+    tags = event.eventTags.all()
     clashes = request.GET.get('clash')
     if clashes:
         clashes = Event.find_by_id(int(clashes))
@@ -68,7 +63,9 @@ def event(request,id):
     context = RequestContext(request, {
         'events': [event],
         'clashes' : clashes,
-        'scheduled_events' : scheduled_events
+<<<<<<< HEAD
+        'tags': tags
+>>>>>>> recommender
     })
     return HttpResponse(template.render(context,request))
 @login_required
@@ -82,15 +79,20 @@ def addEvent(request):
         end_time = date(request.POST.get('enddate',''))
         currentUsername = request.user.username
         user = CustomUser.objects.get(username=currentUsername)
-        tags = []
+        tags = request.POST.getlist('tags[]',[])
         cost = 0
         public = True
         e = Event(title=title, start_time=start_time, end_time=end_time, location=location, description=description, public=public, price=cost, user=user)
         e.save()
+        for tag in tags:
+             e.eventTags.add(tag)
         return redirect('event', e.id)
     else:
+        tags = Tag.objects.all()
         template = loader.get_template('addevent.html')
-        context = RequestContext(request,{})
+        context = RequestContext(request,{
+            'tags': tags
+        })
         return HttpResponse(template.render(context,request))
 
 @login_required

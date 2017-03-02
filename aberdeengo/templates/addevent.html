@@ -94,7 +94,56 @@
 				<label for="title">Event End Date</label>
 				<input type="text" id="enddate" name="enddate" placeholder="2016-11-25T12:01:00">
 				<br>
+				<!--{% for tag in tags %}-->
+				<!--<label>-->
+				<!--  <input type="checkbox" name="tags">{{tag.name}}-->
+				<!--</label>-->
+				<!--{% endfor %}-->
+				<!--<br>-->
+				<br>
+          
+    
+    
+        <script>
+        function selectTag(select)
+        {
+          var option = select.options[select.selectedIndex];
+          var ul = select.parentNode.getElementsByTagName('ul')[0];
+     
+          var choices = ul.getElementsByTagName('input');
+          for (var i = 0; i < choices.length; i++)
+          if (choices[i].value == option.value)
+            return;
+     
+          var li = document.createElement('li');
+          var input = document.createElement('input');
+          var text = document.createTextNode(option.firstChild.data);
+     
+          input.type = 'hidden';
+          input.name = 'tags[]';
+          input.value = option.value;
+
+          li.appendChild(input);
+          li.appendChild(text);
+          li.setAttribute('onclick', 'this.parentNode.removeChild(this);');     
+    
+          ul.appendChild(li);
+          }
+        </script>
+    
+        <ul>
+        </ul>
+        <select onchange="selectTag(this);">
+        {% for tag in tags%}
+          <option value="{{tag.id}}">{{tag.name}}</option>
+        {% endfor %}
+        </select>
+
+          <br>
+          <br>
+          <br>
+          <br>
 				<input type="submit" value="submit">
     </div>
 
-    {% endblock %}
+  {% endblock %}

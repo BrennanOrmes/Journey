@@ -67,6 +67,10 @@
   <p>From: {{ event.start_time|date:"D d M Y P" }}</p>
   <p>To: {{ event.end_time|date:"D d M Y P" }}</p>
   <p>Description: {{ event.description }}</p>
+  <p>Tags:</p>
+  {% for tag in event.eventTags.all %}
+  <p>{{tag.name}}</p>
+  {% endfor %}
   <form action="{% url 'scheduleevent' %}" method="post">
     {% csrf_token %}
     <input type="hidden" name="event_id" value="{{ event.id }}" /> {% if event in scheduled_events %}
