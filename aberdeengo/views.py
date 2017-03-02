@@ -11,7 +11,7 @@ from django.contrib.auth.forms import PasswordChangeForm
 
 from scripts.event import Event
 from scripts.schedule import Schedule, EventsClash
-from scripts.test import current_schedule, user_tags, date
+from scripts.test import user_tags, date
 from .models import CustomUser, Tag
 
 
@@ -33,6 +33,9 @@ def searchEvents(request):
     events = Event.search(search_string, user_tags) #TODO: add limiting
     events.sort(key=lambda x: x.start_time)
     template = loader.get_template('search.html')
+    context = RequestContext(request,{
+        'events': events
+    })
     return HttpResponse(template.render(context,request))
 
 @login_required
@@ -63,9 +66,7 @@ def event(request,id):
     context = RequestContext(request, {
         'events': [event],
         'clashes' : clashes,
-<<<<<<< HEAD
         'tags': tags
->>>>>>> recommender
     })
     return HttpResponse(template.render(context,request))
 @login_required

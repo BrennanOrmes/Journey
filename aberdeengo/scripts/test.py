@@ -60,7 +60,7 @@ e5 = Event(title=u"Operating Systems Hackathon",
 """
 
 # e1, e2, e3, e4, e5 = Event.objects.all()[:5]
-current_schedule = Schedule.objects.get(pk=5)
+# current_schedule = Schedule.objects.get(pk=5)
 """
 current_schedule = Schedule()
 current_schedule.save()
