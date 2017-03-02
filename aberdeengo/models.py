@@ -103,6 +103,10 @@ class Schedule(models.Model):
         an EventsClash exception is thrown"""
         events = self.scheduleentry_set.all()
         
+        if newentry.start == '':
+            newentry.start = newentry.event.start_time
+        if newentry.end == '':
+            newentry.start = newentry.event.start_time
         #maybe put this in a different method to be called?
         #checking that scheduled time is consistent with event and itself
         if newentry.start > newentry.end:
@@ -171,6 +175,10 @@ class InconsistentTime(Exception):
     def __init__(self,e1,e2):
         self.e1 = e1
         self.e2 = e2
+
+class wrongFormat(Exception):
+    def __init__(self, time):
+        self.time = time
 
 def between(x, y, z):
     "Returns true if x <= y <= z"
