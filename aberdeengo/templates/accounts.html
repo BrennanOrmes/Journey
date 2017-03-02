@@ -1,35 +1,44 @@
 {% extends "layout.html" %}
 {% block content %}
 {% load static %}
-  <link rel="stylesheet" href="{% static "customCSS/accountStyle.css" %}">
+  <link rel="stylesheet" href="{% static " customCSS/accountStyle.css " %}">
 
-<div class="row"  id="user-content">
+<div class="row" id="user-content">
 
-    <div class="col-xs-3"  id="side-bar">
+    <div class="col-xs-3" id="side-bar">
 
         <img src="http://www.rsc-scotland.ac.uk/Dragons/images/speakers/EC_2011%20web.jpg" alt="HTML5 Icon" style="width:120px;height:140px;">
         <h5>{{user.username}}!</h5>
-        
-       
-     
-            <li id="click"> <a id="profile" data="{% url 'editAccount' %}">
-               profile
-            </a> </li>
-            <li id="click"> <a id="interests" data="{% url 'interests' %}">
-                  interests
-            </a> </li>
-            <li id="click"> <a id="events" data="{% url 'ownedEvents' %}">
-               events
-            </a> </li>
+
+
     
 
     </div>
-    <div class="col-xs-9"  id="main-content">
-        
+    <div class="col-xs-9">
+        <div class="row" id="linkrow">
+           <div class="col-xs-9">
+           </div>
+           <div class="col-xs-3">
+  
+               <a id="profile" data="{% url 'editAccount' %}">
+               profile
+            </a> 
+            <a id="events" data="{% url 'ownedEvents' %}">
+               events
+            </a>
+            </ul>
+           </div>
+            
+
+        </div>
+        <div class="row" id="main-content">
+
+
+        </div>
 
     </div>
 </div>
 {% load static %}
     <script src="{% static "accountScript.js" %}"></script>
-   
+
 {% endblock %}
