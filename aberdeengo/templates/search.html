@@ -1,4 +1,5 @@
 {% extends "layout.html" %} {% block content %}
+
 <div id="map" style="width:100%;height:500px;"></div>
 
         <script>
@@ -56,8 +57,7 @@
   <input type="text" name="q">
   <input type="submit" value="submit">
 </form>
-</div>
-</div>
+
 {% for event in events %}
 <div class="col-xs-6 col-lg-4">
   <h2><a href="{% url 'event' event.id %}">{{ event.title }}</a></h2>
@@ -81,10 +81,8 @@
   </form>
 </div>
 
-  <script src="https://maps.googleapis.com/maps/api/js?callback=myMap"></script>
-  <script async defer src="https://maps.googleapis.com/maps/api/js?key={{API_Key}}&callback=initMap">
-  </script>
+<script src="https://maps.googleapis.com/maps/api/js?callback=myMap"></script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key={{API_Key}}&callback=initMap">
+</script>
 
-</div>
-
-{% endfor %} {%endblock %}
+{% endfor %}{%endblock %}
