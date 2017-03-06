@@ -64,11 +64,13 @@ def event(request,id):
         scheduled_events = []
     else:
         user = CustomUser.objects.get(username=request.user.username)
+        scheduled_events = user.schedule.scheduled_events()
     context = RequestContext(request, {
         'events': [event],
         'clashes' : clashes,
         'tags': tags,
-        'inconsistentTime': inconsistentTime
+        'inconsistentTime': inconsistentTime,
+        'scheduled_events' : scheduled_events
     })
     return HttpResponse(template.render(context,request))
 @login_required
