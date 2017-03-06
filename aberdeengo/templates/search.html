@@ -65,7 +65,7 @@
   <div class="alert-warning" role="alert">Clashes with <a href="{% url 'event' clashes.id%}">{{clashes.title}}</a></div>
   {% endif %}
   {% if inconsistentTime  %}
-  <div class="alert-warning" role="alert">Time scheduled is {{inconsistentTime}} than the event takes place</div>
+  <div class="alert-warning" role="alert">Time scheduled is {{inconsistentTime}}</div>
   {% endif  %}
   <p>From: {{ event.start_time|date:"D d M Y P" }}</p>
   <p>To: {{ event.end_time|date:"D d M Y P" }}</p>

@@ -110,14 +110,15 @@ class Schedule(models.Model):
         #maybe put this in a different method to be called?
         #checking that scheduled time is consistent with event and itself
         if newentry.start > newentry.end:
-            raise InconsistentTime(newentry.event, "leaving before going")
+            s = "implying you are leaving before going"
+            raise InconsistentTime(newentry.event, s)
         elif newentry.start == newentry.end:
-            raise InconsistentTime(newentry.event, "going and leaving at the same time")
+            raise InconsistentTime(newentry.event, "implying you are going and leaving at the same time")
         else:
             if newentry.start < newentry.event.start_time:
-                raise InconsistentTime(newentry.event, "earlier")
+                raise InconsistentTime(newentry.event, "earlier than the event takes place")
             elif newentry.end > newentry.event.end_time:
-                raise InconsistentTime(newentry.event, "later") #hack, it would be better if the error wasn't in the link. fix in another branch
+                raise InconsistentTime(newentry.event, "later than the event takes place") #hack, it would be better if the error wasn't in the link. fix in another branch
      
         
         for e in events:
@@ -176,9 +177,6 @@ class InconsistentTime(Exception):
         self.e1 = e1
         self.e2 = e2
 
-class wrongFormat(Exception):
-    def __init__(self, time):
-        self.time = time
 
 def between(x, y, z):
     "Returns true if x <= y <= z"

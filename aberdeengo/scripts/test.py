@@ -1,15 +1,19 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-from schedule import Schedule
+from schedule import Schedule, InconsistentTime
 from event import Event
 from datetime import datetime
 import pytz
+import re
 #from .models import Events
 
 def date(s):
-    unaware = datetime.strptime(s,"%Y-%m-%dT%H:%M:%S")
-    now_aware = pytz.utc.localize(unaware)
-    return now_aware
+    try:
+        unaware = datetime.strptime(s,"%Y-%m-%dT%H:%M:%S")
+        now_aware = pytz.utc.localize(unaware)
+        return now_aware
+    except ValueError:
+        raise InconsistentTime(s, "just plain wrong m8")
 
 
 # Test Data
