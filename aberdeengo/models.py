@@ -43,11 +43,6 @@ class LocationTag(models.Model):
     event = models.ForeignKey(Location, on_delete=models.CASCADE)
     tag = models.ForeignKey(Tag, on_delete=models.CASCADE)
 
-class ScheduleEntry(models.Model):
-    event = models.ForeignKey(Events, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    start = models.TimeField()
-    end = models.TimeField()
 
 
 class Event(models.Model):
@@ -107,37 +102,45 @@ class Event(models.Model):
         tags = set(tags)
         return not tags or tags.intersection(self.tags)
 
-    def clashes_with(self, other):
-        """Checks if this event overlaps with another event"""
-        return (between(self.start_time, other.start_time, self.end_time)
-                or between(other.start_time, self.start_time, other.end_time))
 
 
 class Schedule(models.Model):
-    events = models.ManyToManyField(Event)
-    # event = models.ForeignKey(Events, on_delete=models.CASCADE)
-    # user = models.ForeignKey(User, on_delete=models.CASCADE)
-    # start = models.TimeField()
-    # end = models.TimeField()
+    events = models.ManyToManyField(Event, through = 'ScheduleEntry')
 
-    def add_event(self, event):
+    def add_event(self, newentry):
         """Add an event to this schedule if possible. If it cannot be added,
         an EventsClash exception is thrown"""
-        events = self.events.all()
-
-        if event in events:
-            return
-
+        events = self.scheduleentry_set.all()
+        
+        if newentry.start == '':
+            newentry.start = newentry.event.start_time
+        if newentry.end == '':
+            newentry.start = newentry.event.start_time
+        #maybe put this in a different method to be called?
+        #checking that scheduled time is consistent with event and itself
+        if newentry.start > newentry.end:
+            s = "implying you are leaving before going"
+            raise InconsistentTime(newentry.event, s)
+        elif newentry.start == newentry.end:
+            raise InconsistentTime(newentry.event, "implying you are going and leaving at the same time")
+        else:
+            if newentry.start < newentry.event.start_time:
+                raise InconsistentTime(newentry.event, "earlier than the event takes place")
+            elif newentry.end > newentry.event.end_time:
+                raise InconsistentTime(newentry.event, "later than the event takes place") #hack, it would be better if the error wasn't in the link. fix in another branch
+     
+        
         for e in events:
-            if event.clashes_with(e):
-                raise EventsClash(event, e)
+            if newentry.clashes_with(e):
+                raise EventsClash(newentry.event, e)
+        # when it clashes we could do a neat thing where a link appears that takes them to the schedule and scrolls down to the one that it clashes with (in another branch of course)
 
-        self.events.add(event)
+        newentry.save()
 
     def remove_event(self, event):
         """Removes an event from this schedule"""
-        self.events.remove(event)
-        # delete without an exception on fail
+        event.delete()
+        # delete without an exception on fail # I will probably move this in scheduleentry
 
     def events_in_range(self, start, end):
         """Returns the events scheduled between the start and end dates"""
@@ -154,9 +157,23 @@ class Schedule(models.Model):
 
     def scheduled_events(self):
         """Returns a list of all the events in this schedule"""
-        # TODO: should we be deleting events that have already passed?
-        return sorted(self.events.all(), key=lambda x: x.start_time)
+        # TODO: should we be deleting events that have already passed? No, we should just not display them. It's good to have them in the database for statistics
+        return sorted(self.scheduleentry_set.all(), key=lambda x: x.start)
 
+class ScheduleEntry(models.Model):
+    event = models.ForeignKey(Event, on_delete=models.CASCADE)
+    schedule = models.ForeignKey(Schedule, on_delete=models.CASCADE)
+    start = models.DateTimeField()
+    end = models.DateTimeField()
+    
+    def clashes_with(self, other):
+        """Checks if this event overlaps with another event"""
+        return (between(self.start, other.start, self.end)
+            or between(other.start, self.start, other.end))
+    
+    @classmethod
+    def find_by_id(self, id):
+        return ScheduleEntry.objects.get(id=id)
 
 class EventsClash(Exception):
     def __init__(self, e1, e2):
@@ -164,6 +181,12 @@ class EventsClash(Exception):
         self.e2 = e2
 
 
+class InconsistentTime(Exception):
+    def __init__(self,e1,e2):
+        self.e1 = e1
+        self.e2 = e2
+
+
 def between(x, y, z):
     "Returns true if x <= y <= z"
-    return (x <= y) and (y <= z)
+    return (x < y) and (y < z)

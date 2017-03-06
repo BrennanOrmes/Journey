@@ -1,2 +1,2 @@
 # -*- coding: utf-8 -*-
-from ..models import Schedule, EventsClash
+from ..models import Schedule, EventsClash, InconsistentTime
