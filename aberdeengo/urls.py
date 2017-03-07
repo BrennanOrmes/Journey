@@ -19,6 +19,9 @@ from django.contrib import admin
 from django.views.generic.detail import DetailView
 from models import CustomUser
 from . import views
+from django.conf import settings
+from django.conf.urls.static import static
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 urlpatterns = patterns('',
 
@@ -42,5 +45,14 @@ urlpatterns = patterns('',
     url(r'^email/$','aberdeengo.views.email', name='email'),
     url(r'^password/$', views.change_password, name='change_password'),
     url(r'^addPayment/$', 'aberdeengo.views.addPayment', name='addPayment'),
-   # url(r'^accounts/(?P<username>\w+)/$', DetailView.as_view(model=CustomUser)),
-)
+) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+
+from django.conf import settings
+from django.contrib.staticfiles import views
+
+urlpatterns += staticfiles_urlpatterns()
+
+urlpatterns += [
+    url(r'^static/(?P<path>.*)$', views.serve),
+]

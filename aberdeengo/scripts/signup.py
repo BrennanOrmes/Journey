@@ -26,3 +26,9 @@ class RegistrationForm(forms.Form):
         return self.cleaned_data
         
         
+
+
+class DocumentForm(forms.Form):
+    docfile = forms.FileField(
+        label='upload profile picture',
+    )

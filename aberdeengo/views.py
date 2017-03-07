@@ -16,7 +16,6 @@ from .models import CustomUser, Tag
 
 
 from scripts.signup import *
-from scripts.profile import *
 
 from .models import CustomUser, ScheduleEntry
 
@@ -180,16 +179,25 @@ def logout(request):
 def accounts(request, username):
     currentUsername = request.user.username
     currentUser = CustomUser.objects.get(username=currentUsername)
-    events = Event.objects.filter(user=currentUser).order_by('publication_date') 
-    context = {
+    if request.method == 'POST':
+        form = DocumentForm(request.POST, request.FILES)
+        if form.is_valid():
+            currentUser.profilePicture = request.FILES['docfile']
+            currentUser.save()
+        return HttpResponseRedirect('/accounts/'+ currentUsername)
+    else:
+        events = Event.objects.filter(user=currentUser).order_by('publication_date') 
+        form = DocumentForm() 
+        context = {
         'user': currentUser,
-        'events': events
-    }
-    if request.user.is_authenticated():
-        template = loader.get_template('accounts.html')
-        return HttpResponse(template.render(context, request))
-    else: 
-        return redirect(login)
+        'events': events,
+        'form': form
+        }
+        return render_to_response(
+        'accounts.html',
+        context,
+        context_instance=RequestContext(request)
+    )
     
 @login_required()     
 def editAccount(request):
@@ -281,3 +289,19 @@ def addPayment(request):
         return HttpResponse(template.render(context, request))
     else:
        return render(request,'ajax/addPayment.html')  
+       
+# def upload(request):
+#     # Handle file upload
+#     if request.method == 'POST':
+#         form = DocumentForm(request.POST, request.FILES)
+#         if form.is_valid():
+#             currentUser.profilePicture = request.FILES['docfile']
+#             currentUser.save()
+#             return HttpResponseRedirect(reverse('accounts'))
+#     else:
+#         form = DocumentForm() 
+#     return render_to_response(
+#         'upload.html',
+#         { 'currentUser': currentUser,'form': form},
+#         context_instance=RequestContext(request)
+#     )

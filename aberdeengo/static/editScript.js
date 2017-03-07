@@ -21,3 +21,10 @@ $("#paymentButton").click(function(event) {
     $("#changeField").load(target, function() {
     });
 });
+
+
+$("#interests").click(function(event) {
+    var target = $(this).attr("data");
+    $("#changeField").load(target, function() {
+    });
+});
