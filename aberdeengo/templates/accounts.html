@@ -7,10 +7,23 @@
 
     <div class="col-xs-3" id="side-bar">
 
-        <img src="http://www.rsc-scotland.ac.uk/Dragons/images/speakers/EC_2011%20web.jpg" alt="HTML5 Icon" style="width:120px;height:140px;">
-        <h5>{{user.username}}!</h5>
-
-
+        {% if user.profilePicture %}
+          <img src="{{user.profilePicture.url}}" alt="{{user.profilePicture.name}}" height="140" width="140"><br>
+            <br>
+        {% else %}
+                <img src="http://www.wpcr.org/wp-content/uploads/2012/11/fb_blank_profile_portrait.png" alt="HTML5 Icon" height="120" width="140">
+        {% endif%}
+         
+    <form action= "{% url 'accounts' username=user.username %}" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <p>{{ form.non_field_errors }}</p>
+                        <p>{{ form.docfile.label_tag }} </p>
+                        <p>
+                                {{ form.docfile.errors }}
+                                {{ form.docfile }}
+                        </p>
+                        <p><input type="submit" value="Upload" /></p>
+                </form>
     
 
     </div>
