@@ -16,9 +16,12 @@
 
 <br>
 
-interests: 
+<p>interests:
+    {% for tag in tags %}
+    <p>{{tag.name}}</p>
+    {% endfor %}
 
-             <input type="submit" value="Add" id="interests" data="{% url 'interests' %}"/>
+    <input type="submit" value="Edit" id="interests" data="{% url 'interests' %}"/></p>
 
 <p> name:  
 

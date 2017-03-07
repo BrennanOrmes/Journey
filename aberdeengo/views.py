@@ -174,8 +174,10 @@ def accounts(request, username):
 def editAccount(request):
     currentUsername = request.user.username
     currentUser = CustomUser.objects.get(username=currentUsername)
+    tags = currentUser.userInterests.all()
     context = {
         'user': currentUser,
+        'tags': tags
     }
     template = loader.get_template('ajax/profile.html')
     return HttpResponse(template.render(context, request))
@@ -193,7 +195,31 @@ def ownedEvents(request):
 
 @login_required()     
 def interests(request):
-    return render(request,'ajax/interests.html')
+    if request.method == 'POST':
+        currentUsername = request.user.username
+        currentUser = CustomUser.objects.get(username=currentUsername)
+        # currentUser.userInterests.delete()
+        for interest in currentUser.userInterests.all():
+            currentUser.userInterests.remove(interest)
+        tags = request.POST.getlist('tags[]',[])
+        for tag in tags:
+            currentUser.userInterests.add(tag)
+        template = loader.get_template('accounts.html')
+        context = {
+            'user': currentUser
+        }
+        return HttpResponse(template.render(context, request))
+    else:
+        currentUsername = request.user.username
+        currentUser = CustomUser.objects.get(username=currentUsername)
+        tags = Tag.objects.all()
+        # tags = list(set(Tag.objects.all()) - set(currentUser.userInterests.all()))
+        context = {
+            'tags': tags,
+            'user': currentUser
+        }
+        template = loader.get_template('ajax/interests.html')
+        return HttpResponse(template.render(context, request))
 
 @login_required()     
 def name(request):
@@ -211,7 +237,7 @@ def name(request):
         }
         return HttpResponse(template.render(context, request))
     else:
-       return render(request,'ajax/name.html')  
+        return render(request,'ajax/name.html')  
 
 @login_required
 def email(request):

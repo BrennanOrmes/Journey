@@ -3,20 +3,21 @@ from django.contrib.auth.models import User
 import datetime
 #from .validators import UnicodeUsernameValidator
 
+class Tag(models.Model):
+    name = models.CharField(max_length=255)
+    description = models.CharField(max_length=255)
+
 class CustomUser(User):
     payment = models.CharField(max_length=255)
     # 'Schedule' needs to be the class name rather than the object to prevent errors
     schedule = models.OneToOneField('Schedule', null=True) # null is temporary
+    userInterests = models.ManyToManyField(Tag)
 
 class Location(models.Model):
     coordinates = models.FloatField(max_length=20) #momentarily not used
     name = models.CharField(max_length=255)
     opentime = models.TimeField(null=True)
     closedtime = models.TimeField(null=True)
-
-class Tag(models.Model):
-    name = models.CharField(max_length=255)
-    description = models.CharField(max_length=255)
 
 class Events(models.Model):
     name = models.CharField(max_length=255)
