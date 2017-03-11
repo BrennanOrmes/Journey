@@ -8,10 +8,12 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
+
 from paypal.standard.forms import PayPalPaymentsForm
 from paypal.standard.models import ST_PP_COMPLETED
 from paypal.standard.ipn.signals import valid_ipn_received
 from django.views.decorators.csrf import csrf_exempt
+from paypal.standard.ipn.signals import payment_was_successful
 
 from scripts.event import Event
 from scripts.schedule import Schedule, EventsClash, InconsistentTime
@@ -62,21 +64,26 @@ def event(request,id):
     inconsistentTime = request.GET.get('inconsistentTime')
     
     
-    template = loader.get_template('search.html')
+    template = loader.get_template('event.html')
     # Will need to split out the veent part of the search template so that we don't get "clashes" appearing everywhere
     if request.user.is_anonymous():
         scheduled_events = []
+        username = ""
     else:
-        user = CustomUser.objects.get(username=request.user.username)
+        username = request.user.username;
+        user = CustomUser.objects.get(username=username)
         scheduled_events = user.schedule.scheduled_events()
     context = RequestContext(request, {
-        'events': [event],
+        'event': event,
         'clashes' : clashes,
         'tags': tags,
         'inconsistentTime': inconsistentTime,
-        'scheduled_events' : scheduled_events
+        'scheduled_events' : scheduled_events,
+        'username' : username
     })
     return HttpResponse(template.render(context,request))
+    
+    
 @login_required
 def addEvent(request):
     if request.method == "POST":
@@ -305,34 +312,29 @@ def pay(request, id):
         "item_name": "make event public",
         "currency_code": "GBP",
         "invoice": "unique-invoice-id",
-        "notify_url": request.build_absolute_uri(reverse('notify')) + reverse('paypal-ipn'),
+        "notify_url": request.build_absolute_uri(reverse('paypal-ipn')),
         "return_url": request.build_absolute_uri(reverse('home')),
-        "cancel_return": request.build_absolute_uri(reverse('home')),
-        "custom": "event.id"
+        "cancel_return": request.build_absolute_uri(reverse('contact')),
+        "custom": id
     }
     
     # Create the instance.
     event = Event.find_by_id(int(id))
     form = PayPalPaymentsForm(initial=paypal_dict)
-    context = {"form": form, "event": event  }
+    context = {"form": form, "event": event , "u":  request.build_absolute_uri(reverse('paypal-ipn')) }
     return render(request, "payment.html", context)
 
-# if request.method == 'POST':
-#         ipn_obj = sender
-#         if ipn_obj.payment_status == ST_PP_COMPLETED:
-#             paid = true;
-#         valid_ipn_received.connect(show_me_the_money)
-#     else: 
+def makePublic(sender, **kwargs):
+    ipn_obj = sender
+    if ipn_obj.payment_status == ST_PP_COMPLETED:
+        eventid = ipn_obj.custom
+        event = Event.find_by_id(int(eventid))
+        event.public = True
+    return
+    
 
-def notify(request, sender):
-    if request.method == 'POST':
-        ipn_obj = sender
-        if ipn_obj.payment_status == ST_PP_COMPLETED:
-            event = Event.objects.get(title="food")
-            event.public = True
-        valid_ipn_received.connect(show_me_the_money)
-    return render(request, "pay.html")
-        
+valid_ipn_received.connect(makePublic)
+
         
     
     

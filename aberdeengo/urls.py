@@ -27,8 +27,8 @@ urlpatterns = patterns('',
 
 
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^$','aberdeengo.views.home', name='home'),
     url(r'^home/$','aberdeengo.views.home', name='home'),
+    url(r'^$','aberdeengo.views.home', name='home'),
     url(r'^search/$','aberdeengo.views.searchEvents', name='search'),
     url(r'^contact/$','aberdeengo.views.contact', name='contact'),
     url(r'^schedule/$','aberdeengo.views.schedule', name='schedule'),
@@ -47,7 +47,6 @@ urlpatterns = patterns('',
     url(r'^addPayment/$', 'aberdeengo.views.addPayment', name='addPayment'),
     url(r'^pay/([0-9]+)$', 'aberdeengo.views.pay', name='pay'),
     url(r'^paypal/', include('paypal.standard.ipn.urls')),
-    url(r'^notify', 'aberdeengo.views.notify', name='notify')
 ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 

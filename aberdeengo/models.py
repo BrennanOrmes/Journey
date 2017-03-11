@@ -3,18 +3,7 @@ from django.contrib.auth.models import User
 import datetime
 from aberdeengo import settings
 
-from paypal.standard.ipn.signals import payment_was_successful
-from paypal.standard.models import ST_PP_COMPLETED
-from paypal.standard.ipn.signals import valid_ipn_received
 
-def make_event_public(sender, **kwargs):
-    ipn_obj = sender
-    # if ipn_obj.payment_status == ST_PP_COMPLETED:
-        # event = Event.objects.get(id=event_id)
-        # event.public = True
-    valid_ipn_received.connect(make_event_public)
-        
-payment_was_successful.connect(make_event_public)
 
 class Tag(models.Model):
     name = models.CharField(max_length=255)
