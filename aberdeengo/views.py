@@ -8,11 +8,15 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
+from paypal.standard.forms import PayPalPaymentsForm
+from paypal.standard.models import ST_PP_COMPLETED
+from paypal.standard.ipn.signals import valid_ipn_received
+from django.views.decorators.csrf import csrf_exempt
 
 from scripts.event import Event
 from scripts.schedule import Schedule, EventsClash, InconsistentTime
 from scripts.test import user_tags, date
-from .models import CustomUser, Tag
+from .models import *
 
 
 from scripts.signup import *
@@ -21,11 +25,12 @@ from .models import CustomUser, ScheduleEntry
 
 # Create your views here. --> WHOOP
 
+@csrf_exempt
 def home(request):
     return render(request,'index.html')
     
 def contact(request):
-    return render(request,'contact.html')
+    return render(request,'contact.html',  context)
     
 def searchEvents(request):
     search_string = request.GET.get("q",'')
@@ -84,13 +89,16 @@ def addEvent(request):
         currentUsername = request.user.username
         user = CustomUser.objects.get(username=currentUsername)
         tags = request.POST.getlist('tags[]',[])
+        public = request.POST.get('public','')
         cost = 0
-        public = True
-        e = Event(title=title, start_time=start_time, end_time=end_time, location=location, description=description, public=public, price=cost, user=user)
+        e = Event(title=title, start_time=start_time, end_time=end_time, location=location, description=description, price=cost, user=user)
         e.save()
         for tag in tags:
              e.eventTags.add(tag)
-        return redirect('event', e.id)
+        if public == "True":
+            return redirect("pay", e.id)
+        else:
+            return redirect('event', e.id)
     else:
         tags = Tag.objects.all()
         template = loader.get_template('addevent.html')
@@ -290,18 +298,41 @@ def addPayment(request):
     else:
        return render(request,'ajax/addPayment.html')  
        
-# def upload(request):
-#     # Handle file upload
-#     if request.method == 'POST':
-#         form = DocumentForm(request.POST, request.FILES)
-#         if form.is_valid():
-#             currentUser.profilePicture = request.FILES['docfile']
-#             currentUser.save()
-#             return HttpResponseRedirect(reverse('accounts'))
-#     else:
-#         form = DocumentForm() 
-#     return render_to_response(
-#         'upload.html',
-#         { 'currentUser': currentUser,'form': form},
-#         context_instance=RequestContext(request)
-#     )
+def pay(request, id):
+    paypal_dict = {
+        "business": "teamalphaau@gmail.com",
+        "amount": "0.01",
+        "item_name": "make event public",
+        "currency_code": "GBP",
+        "invoice": "unique-invoice-id",
+        "notify_url": request.build_absolute_uri(reverse('notify')) + reverse('paypal-ipn'),
+        "return_url": request.build_absolute_uri(reverse('home')),
+        "cancel_return": request.build_absolute_uri(reverse('home')),
+        "custom": "event.id"
+    }
+    
+    # Create the instance.
+    event = Event.find_by_id(int(id))
+    form = PayPalPaymentsForm(initial=paypal_dict)
+    context = {"form": form, "event": event  }
+    return render(request, "payment.html", context)
+
+# if request.method == 'POST':
+#         ipn_obj = sender
+#         if ipn_obj.payment_status == ST_PP_COMPLETED:
+#             paid = true;
+#         valid_ipn_received.connect(show_me_the_money)
+#     else: 
+
+def notify(request, sender):
+    if request.method == 'POST':
+        ipn_obj = sender
+        if ipn_obj.payment_status == ST_PP_COMPLETED:
+            event = Event.objects.get(title="food")
+            event.public = True
+        valid_ipn_received.connect(show_me_the_money)
+    return render(request, "pay.html")
+        
+        
+    
+    
