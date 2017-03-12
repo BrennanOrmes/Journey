@@ -308,7 +308,7 @@ def addPayment(request):
 def pay(request, id):
     paypal_dict = {
         "business": "teamalphaau@gmail.com",
-        "amount": "0.01",
+        "amount": "1.00",
         "item_name": "make event public",
         "currency_code": "GBP",
         "invoice": "unique-invoice-id",
@@ -326,12 +326,11 @@ def pay(request, id):
 
 def makePublic(sender, **kwargs):
     ipn_obj = sender
-    if ipn_obj.payment_status == ST_PP_COMPLETED:
-        eventid = ipn_obj.custom
-        event = Event.find_by_id(int(eventid))
-        event.public = True
-    return
-    
+    eventid = ipn_obj.custom
+    event = Event.find_by_id(int(eventid))
+    event.public = True
+    event.save()
+
 
 valid_ipn_received.connect(makePublic)
 
