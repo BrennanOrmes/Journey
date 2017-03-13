@@ -3,7 +3,7 @@
     <h4>
         <ul>
             {% for e in events %}
-            <li>{{ e.title }}</li>
+            <li> <a href="{% url 'event' e.id %}">{{ e.title }}</a></li>
             </br>
             {% endfor %}
         </ul>

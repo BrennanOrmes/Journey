@@ -9,24 +9,30 @@ from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
 
+from paypal.standard.forms import PayPalPaymentsForm
+from paypal.standard.models import ST_PP_COMPLETED
+from paypal.standard.ipn.signals import valid_ipn_received
+from django.views.decorators.csrf import csrf_exempt
+from paypal.standard.ipn.signals import payment_was_successful
+
 from scripts.event import Event
 from scripts.schedule import Schedule, EventsClash, InconsistentTime
 from scripts.test import user_tags, date
-from .models import CustomUser, Tag
+from .models import *
 
 
 from scripts.signup import *
-from scripts.profile import *
 
 from .models import CustomUser, ScheduleEntry
 
 # Create your views here. --> WHOOP
 
+@csrf_exempt
 def home(request):
     return render(request,'index.html')
     
 def contact(request):
-    return render(request,'contact.html')
+    return render(request,'contact.html',  context)
     
 def searchEvents(request):
     search_string = request.GET.get("q",'')
@@ -71,19 +77,26 @@ def event(request,id):
     inconsistentTime = request.GET.get('inconsistentTime')
     
     
-    template = loader.get_template('search.html')
+    template = loader.get_template('event.html')
     # Will need to split out the veent part of the search template so that we don't get "clashes" appearing everywhere
     if request.user.is_anonymous():
         scheduled_events = []
+        username = ""
     else:
-        user = CustomUser.objects.get(username=request.user.username)
+        username = request.user.username;
+        user = CustomUser.objects.get(username=username)
+        scheduled_events = user.schedule.scheduled_events()
     context = RequestContext(request, {
-        'events': [event],
+        'event': event,
         'clashes' : clashes,
         'tags': tags,
-        'inconsistentTime': inconsistentTime
+        'inconsistentTime': inconsistentTime,
+        'scheduled_events' : scheduled_events,
+        'username' : username
     })
     return HttpResponse(template.render(context,request))
+    
+    
 @login_required
 def addEvent(request):
     if request.method == "POST":
@@ -96,13 +109,16 @@ def addEvent(request):
         currentUsername = request.user.username
         user = CustomUser.objects.get(username=currentUsername)
         tags = request.POST.getlist('tags[]',[])
+        public = request.POST.get('public','')
         cost = 0
-        public = True
-        e = Event(title=title, start_time=start_time, end_time=end_time, location=location, description=description, public=public, price=cost, user=user)
+        e = Event(title=title, start_time=start_time, end_time=end_time, location=location, description=description, price=cost, user=user)
         e.save()
         for tag in tags:
              e.eventTags.add(tag)
-        return redirect('event', e.id)
+        if public == "True":
+            return redirect("pay", e.id)
+        else:
+            return redirect('event', e.id)
     else:
         tags = Tag.objects.all()
         template = loader.get_template('addevent.html')
@@ -191,16 +207,25 @@ def logout(request):
 def accounts(request, username):
     currentUsername = request.user.username
     currentUser = CustomUser.objects.get(username=currentUsername)
-    events = Event.objects.filter(user=currentUser).order_by('publication_date') 
-    context = {
+    if request.method == 'POST':
+        form = DocumentForm(request.POST, request.FILES)
+        if form.is_valid():
+            currentUser.profilePicture = request.FILES['docfile']
+            currentUser.save()
+        return HttpResponseRedirect('/accounts/'+ currentUsername)
+    else:
+        events = Event.objects.filter(user=currentUser).order_by('publication_date') 
+        form = DocumentForm() 
+        context = {
         'user': currentUser,
-        'events': events
-    }
-    if request.user.is_authenticated():
-        template = loader.get_template('accounts.html')
-        return HttpResponse(template.render(context, request))
-    else: 
-        return redirect(login)
+        'events': events,
+        'form': form
+        }
+        return render_to_response(
+        'accounts.html',
+        context,
+        context_instance=RequestContext(request)
+    )
     
 @login_required()     
 def editAccount(request):
@@ -291,6 +316,33 @@ def addPayment(request):
         }
         return HttpResponse(template.render(context, request))
     else:
-       return render(request,'ajax/addPayment.html')
+       return render(request,'ajax/addPayment.html')  
+       
+def pay(request, id):
+    paypal_dict = {
+        "business": "teamalphaau@gmail.com",
+        "amount": "1.00",
+        "item_name": "make event public",
+        "currency_code": "GBP",
+        "invoice": "unique-invoice-id",
+        "notify_url": request.build_absolute_uri(reverse('paypal-ipn')),
+        "return_url": request.build_absolute_uri(reverse('home')),
+        "cancel_return": request.build_absolute_uri(reverse('contact')),
+        "custom": id
+    }
+    
+    # Create the instance.
+    event = Event.find_by_id(int(id))
+    form = PayPalPaymentsForm(initial=paypal_dict)
+    context = {"form": form, "event": event , "u":  request.build_absolute_uri(reverse('paypal-ipn')) }
+    return render(request, "payment.html", context)
+
+def makePublic(sender, **kwargs):
+    ipn_obj = sender
+    eventid = ipn_obj.custom
+    event = Event.find_by_id(int(eventid))
+    event.public = True
+    event.save()
 
 
+valid_ipn_received.connect(makePublic)

@@ -19,13 +19,16 @@ from django.contrib import admin
 from django.views.generic.detail import DetailView
 from models import CustomUser
 from . import views
+from django.conf import settings
+from django.conf.urls.static import static
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 urlpatterns = patterns('',
 
 
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^$','aberdeengo.views.home', name='home'),
     url(r'^home/$','aberdeengo.views.home', name='home'),
+    url(r'^$','aberdeengo.views.home', name='home'),
     url(r'^search/$','aberdeengo.views.searchEvents', name='search'),
     url(r'^contact/$','aberdeengo.views.contact', name='contact'),
     url(r'^schedule/$','aberdeengo.views.schedule', name='schedule'),
@@ -42,5 +45,16 @@ urlpatterns = patterns('',
     url(r'^email/$','aberdeengo.views.email', name='email'),
     url(r'^password/$', views.change_password, name='change_password'),
     url(r'^addPayment/$', 'aberdeengo.views.addPayment', name='addPayment'),
-   # url(r'^accounts/(?P<username>\w+)/$', DetailView.as_view(model=CustomUser)),
-)
+    url(r'^pay/([0-9]+)$', 'aberdeengo.views.pay', name='pay'),
+    url(r'^paypal/', include('paypal.standard.ipn.urls')),
+) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+
+from django.conf import settings
+from django.contrib.staticfiles import views
+
+urlpatterns += staticfiles_urlpatterns()
+
+urlpatterns += [
+    url(r'^static/(?P<path>.*)$', views.serve),
+]

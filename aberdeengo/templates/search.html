@@ -74,6 +74,7 @@
 </div>
 </div>
 {% for event in events %}
+{% if event.public == True %}
 <div class="col-xs-6 col-lg-4">
   <h2><a href="{% url 'event' event.id %}">{{ event.title }}</a></h2>
   {% if clashes %}
@@ -110,5 +111,5 @@
   </form>
 </div>
 </div>
-
+{% endif %}
 {% endfor %} {%endblock %}

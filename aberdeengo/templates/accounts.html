@@ -1,35 +1,57 @@
 {% extends "layout.html" %}
 {% block content %}
 {% load static %}
-  <link rel="stylesheet" href="{% static "customCSS/accountStyle.css" %}">
+  <link rel="stylesheet" href="{% static " customCSS/accountStyle.css " %}">
 
-<div class="row"  id="user-content">
+<div class="row" id="user-content">
 
-    <div class="col-xs-3"  id="side-bar">
+    <div class="col-xs-3" id="side-bar">
 
-        <img src="http://www.rsc-scotland.ac.uk/Dragons/images/speakers/EC_2011%20web.jpg" alt="HTML5 Icon" style="width:120px;height:140px;">
-        <h5>{{user.username}}!</h5>
-        
-       
-     
-            <li id="click"> <a id="profile" data="{% url 'editAccount' %}">
-               profile
-            </a> </li>
-            <li id="click"> <a id="interests" data="{% url 'interests' %}">
-                  interests
-            </a> </li>
-            <li id="click"> <a id="events" data="{% url 'ownedEvents' %}">
-               events
-            </a> </li>
+        {% if user.profilePicture %}
+          <img src="{{user.profilePicture.url}}" alt="{{user.profilePicture.name}}" height="140" width="140"><br>
+            <br>
+        {% else %}
+                <img src="http://www.wpcr.org/wp-content/uploads/2012/11/fb_blank_profile_portrait.png" alt="HTML5 Icon" height="120" width="140">
+        {% endif%}
+         
+    <form action= "{% url 'accounts' username=user.username %}" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <p>{{ form.non_field_errors }}</p>
+                        <p>{{ form.docfile.label_tag }} </p>
+                        <p>
+                                {{ form.docfile.errors }}
+                                {{ form.docfile }}
+                        </p>
+                        <p><input type="submit" value="Upload" /></p>
+                </form>
     
 
     </div>
-    <div class="col-xs-9"  id="main-content">
-        
+    <div class="col-xs-9">
+        <div class="row" id="linkrow">
+           <div class="col-xs-9">
+           </div>
+           <div class="col-xs-3">
+  
+               <a id="profile" data="{% url 'editAccount' %}">
+               profile
+            </a> 
+            <a id="events" data="{% url 'ownedEvents' %}">
+               events
+            </a>
+            </ul>
+           </div>
+            
+
+        </div>
+        <div class="row" id="main-content">
+
+
+        </div>
 
     </div>
 </div>
 {% load static %}
     <script src="{% static "accountScript.js" %}"></script>
-   
+
 {% endblock %}

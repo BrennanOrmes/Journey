@@ -1,7 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import User
 import datetime
-#from .validators import UnicodeUsernameValidator
+from aberdeengo import settings
+
+
 
 class Tag(models.Model):
     name = models.CharField(max_length=255)
@@ -12,6 +14,7 @@ class CustomUser(User):
     # 'Schedule' needs to be the class name rather than the object to prevent errors
     schedule = models.OneToOneField('Schedule', null=True) # null is temporary
     interests = models.ManyToManyField(Tag)
+    profilePicture = models.ImageField('pictures/profile/%Y/%m/%d', null=True)
 
 class Location(models.Model):
     coordinates = models.FloatField(max_length=20) #momentarily not used
@@ -51,7 +54,7 @@ class Event(models.Model):
     end_time = models.DateTimeField()
     location = models.CharField(max_length=255) # models.ForeignKey(Location, on_delete=models.CASCADE)
     description = models.CharField(max_length=255)
-    public = models.BooleanField() # default true
+    public = models.BooleanField(default=False)
     price = models.IntegerField(null=True)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, default=1)
     publication_date = models.DateField(("Date"), default=datetime.date.today)
