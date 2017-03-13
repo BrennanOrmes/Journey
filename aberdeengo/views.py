@@ -8,11 +8,12 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.admin.views.decorators import staff_member_required
 
 from scripts.event import Event
 from scripts.schedule import Schedule, EventsClash, InconsistentTime
 from scripts.test import user_tags, date
-from .models import CustomUser, Tag
+from .models import CustomUser, Tag, Summary
 
 
 from scripts.signup import *
@@ -305,3 +306,8 @@ def addPayment(request):
 #         { 'currentUser': currentUser,'form': form},
 #         context_instance=RequestContext(request)
 #     )
+
+# @staff_member_required
+def stats(request):
+    s = Summary.most_recent(force=True)
+    return render(request, 'stats.html', {'summary': s})

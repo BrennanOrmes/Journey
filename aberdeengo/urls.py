@@ -45,6 +45,7 @@ urlpatterns = patterns('',
     url(r'^email/$','aberdeengo.views.email', name='email'),
     url(r'^password/$', views.change_password, name='change_password'),
     url(r'^addPayment/$', 'aberdeengo.views.addPayment', name='addPayment'),
+    url(r'^stats/$', 'aberdeengo.views.stats', name='stats')
 ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 

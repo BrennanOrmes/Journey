@@ -227,6 +227,14 @@ class Summary(models.Model):
     new_users = models.IntegerField(default=0)
 
     @classmethod
+    def most_recent(self, force=False):
+        retval = Summary.objects.order_by('-updated').first()
+        if retval is None and force == True:
+            return Summary.now()
+        else:
+            return retval
+
+    @classmethod
     def now(self):
         s = Summary()
         s.num_events = s._num_events()

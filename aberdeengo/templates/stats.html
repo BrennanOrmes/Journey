@@ -1,0 +1,64 @@
+{% extends "layout.html" %}
+{% block content %}
+
+    <h2>Site Statistics</h2>
+    <p>Statistics valid as of {{ summary.updated | date }}.</p>
+    <table>
+        <tr>
+            <td>Number of Created Events</td><td>{{ summary.num_events }}</td>
+        </tr>
+        <tr>
+            <td>Number of Attended Events</td><td>{{ summary.num_attended }}</td>
+        </tr>
+        <tr>
+            {% with summary.most_attended as event %}
+            <td>Most Attended Event</td><td><a href="{% url 'event' event.id %}">{{ event.title }}</a></td>
+            {% endwith %}
+        </tr>
+        <tr>
+            <td>Number of Active Users</td><td>{{ summary.num_active }}</td>
+        </tr>
+        <tr>
+            <td>Number of New Users</td><td>{{ summary.new_users }}</td>
+        </tr>
+        <!--
+        <tr>
+            <td>Number of Inactive Users</td><td></td>
+        </tr>
+        -->
+        <!--
+        most popular regions
+        most popular location
+        popular prices
+        -->
+    </table>
+
+    <h3>Event Information</h3>
+    <table>
+        <tr>
+            <th>Event</th>
+            <th>Number of Attendees</th>
+        </tr>
+        {% for e in summary.eventsummary_set.all %}
+            <tr>
+                <td><a href="{% url 'event' e.event.id %}">{{ e.event.title }}</a></td>
+                <td>{{ e.num_attendees }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+    
+    <h3>Tag Information</h3>
+    <table>
+        <tr>
+            <th>Tag</th>
+            <th>Number of Events</th>
+        </tr>
+        {% for t in summary.tagsummary_set.all %}
+            <tr>
+                <td>{{ t.tag.name }}</td>
+                <td>{{ t.num_events }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+
+{% endblock %}
