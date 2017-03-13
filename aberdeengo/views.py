@@ -38,23 +38,35 @@ def home(request):
         votes = Vote.objects.filter(user = currentUser)
         events_by_interest = []
         events_by_other_users = []
-        Vote.objects.filter(user=currentUser).order_by('interestScore').reverse()
-        for event in Event.objects.all():
-            v = Vote.objects.filter(user=currentUser).filter(event=event)
-            for vote in v:
-                if vote.interestScore is not 0:
+        # Vote.objects.filter(user__username=currentUsername).order_by('interestScore').reverse()
+        votes = votes.order_by('interestScore').reverse()
+        # voteInterest = Vote.objects.filter(user = currentUser)
+        voteInterest = votes.order_by('interestScore').reverse()
+        
+        for vote in votes:
+            for event in Event.objects.all():
+                if vote.event == event and vote.interestScore is not 0:
                     events_by_interest.append(event)
-        Vote.objects.filter(user=currentUser).order_by('othersScore').reverse()
-        for event in Event.objects.all():
-            v = Vote.objects.filter(user=currentUser).filter(event=event)
-            for vote in v:
-                if vote.othersScore is not 0:
+        
+        # Vote.objects.filter(user=currentUser).order_by('othersScore').reverse()
+        # voteOthers = Vote.objects.filter(user = currentUser)
+        
+        votes = votes.order_by('othersScore').reverse()
+        # voteInterest = Vote.objects.filter(user = currentUser)
+        voteOthers = votes.order_by('interestScore').reverse()
+        
+        for vote in votes:
+            for event in Event.objects.all():
+                if vote.event == event and vote.othersScore is not 0:
                     events_by_other_users.append(event)
+        
         template = loader.get_template('index.html')
         context = RequestContext(request, {
             'events_by_interest': events_by_interest,
             'events_by_other_users': events_by_other_users,
-            'votes': votes
+            'votes': votes,
+            'voteInterest': voteInterest,
+            'voteOthers': voteOthers
         })
         return HttpResponse(template.render(context,request))
     
