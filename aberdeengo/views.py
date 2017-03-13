@@ -12,18 +12,51 @@ from django.contrib.auth.forms import PasswordChangeForm
 from scripts.event import Event
 from scripts.schedule import Schedule, EventsClash
 from scripts.test import user_tags, date
-from .models import CustomUser, Tag
+from scripts.recommendations import recommend_by_interest, recommend_by_other_users
+from .models import CustomUser, Tag, Vote
 
 
 from scripts.signup import *
 from scripts.profile import *
 
-from .models import CustomUser
-
 # Create your views here. --> WHOOP
 
 def home(request):
-    return render(request,'index.html')
+    if request.user.is_anonymous():
+        return render(request,'index.html')
+    else:
+        currentUsername = request.user.username
+        currentUser = CustomUser.objects.get(username=currentUsername)
+        Vote.objects.filter(user=currentUser).delete()
+        for event in Event.objects.all():
+            v = Vote(user=currentUser, event=event, interestScore=0, othersScore=0)
+            v.save()
+        # events_by_interest = recommend_by_interest(currentUser)
+        # events_by_other_users = recommend_by_other_users(currentUser)
+        recommend_by_interest(currentUser)
+        recommend_by_other_users(currentUser)
+        votes = Vote.objects.filter(user = currentUser)
+        events_by_interest = []
+        events_by_other_users = []
+        Vote.objects.filter(user=currentUser).order_by('interestScore').reverse()
+        for event in Event.objects.all():
+            v = Vote.objects.filter(user=currentUser).filter(event=event)
+            for vote in v:
+                if vote.interestScore is not 0:
+                    events_by_interest.append(event)
+        Vote.objects.filter(user=currentUser).order_by('othersScore').reverse()
+        for event in Event.objects.all():
+            v = Vote.objects.filter(user=currentUser).filter(event=event)
+            for vote in v:
+                if vote.othersScore is not 0:
+                    events_by_other_users.append(event)
+        template = loader.get_template('index.html')
+        context = RequestContext(request, {
+            'events_by_interest': events_by_interest,
+            'events_by_other_users': events_by_other_users,
+            'votes': votes
+        })
+        return HttpResponse(template.render(context,request))
     
 def contact(request):
     return render(request,'contact.html')
@@ -198,9 +231,9 @@ def interests(request):
     if request.method == 'POST':
         currentUsername = request.user.username
         currentUser = CustomUser.objects.get(username=currentUsername)
-        # currentUser.userInterests.delete()
-        for interest in currentUser.userInterests.all():
-            currentUser.userInterests.remove(interest)
+        # for interest in currentUser.userInterests.all():
+        #     currentUser.userInterests.remove(interest)
+        currentUser.userInterests.clear()
         tags = request.POST.getlist('tags[]',[])
         for tag in tags:
             currentUser.userInterests.add(tag)

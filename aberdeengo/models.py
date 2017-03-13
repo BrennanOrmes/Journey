@@ -112,6 +112,11 @@ class Event(models.Model):
         return (between(self.start_time, other.start_time, self.end_time)
                 or between(other.start_time, self.start_time, other.end_time))
 
+class Vote(models.Model):
+    user = models.ForeignKey(CustomUser)
+    event = models.ForeignKey(Event)
+    interestScore = models.IntegerField(default = 0)
+    othersScore = models.IntegerField(default = 0)
 
 class Schedule(models.Model):
     events = models.ManyToManyField(Event)
