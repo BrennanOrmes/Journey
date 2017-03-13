@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="row">
+    <div class="col-xs-3">
+        
+    </div>
+     <div class="col-xs-6">
+         <h2> pay to make event public?</h2> <br>
+        {{form.render}} <br>
+        <h2> don't pay to keep your event private </h2>
+             <a href="{% url 'event' event.id %}">Back</a>
+    </div>
+    
+    
+</div>
+
+
+{% endblock %}
