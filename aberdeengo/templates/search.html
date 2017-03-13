@@ -1,10 +1,71 @@
 {% extends "layout.html" %} {% block content %}
 <div id="map" style="width:100%;height:500px;"></div>
     <script>
+    markerArray = []
+      function initMap() {
+        var map = new google.maps.Map(document.getElementById('map'), {
+          center: {lat: -34.397, lng: 150.644},
+          zoom: 13
+        });
+        var infoWindow = new google.maps.InfoWindow({map: map});
+
+        // Try HTML5 geolocation.
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(function(position) {
+            var pos = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude
+            };
+
+            infoWindow.setPosition(pos);
+            infoWindow.setContent('You are here.');
+            map.setCenter(pos);
+          }, function() {
+            handleLocationError(true, infoWindow, map.getCenter());
+          });
+        } else {
+          // Browser doesn't support Geolocation
+          handleLocationError(false, infoWindow, map.getCenter());
+        }
+        {% for event in events %}
+        placeMarker(map, "{{event.title}}", "{{event.location}}", "{% url 'event' event.id %}");
+        {% endfor %}
         
         
+        // Add a marker clusterer to manage the markers.
+              var markerCluster = new MarkerClusterer(map, markers,
+              {imagePath: 'images/'});
+
+      }
+
+      function handleLocationError(browserHasGeolocation, infoWindow, pos) {
+        infoWindow.setPosition(pos);
+        infoWindow.setContent(browserHasGeolocation ?
+                              'Error: The Geolocation service failed.' :
+                              'Error: Your browser doesn\'t support geolocation.');
+      }
+      
+    function placeMarker(map, title, location , url) {
+            var input = location.substring(1, location.length-1);
+            var latlngStr = input.split(",",2);
+            var lat = parseFloat(latlngStr[0]);
+            var lng = parseFloat(latlngStr[1]);
+            location = new google.maps.LatLng(lat, lng);
+            var marker = new google.maps.Marker({
+              position: location,
+              map: map
+            });
+            var infowindow = new google.maps.InfoWindow({
+              content: "<a href=\"" + url +"\">" + title + "</a>"
+            });
+            marker.addListener('click', function() {
+            infowindow.open(map,marker)
+            markerArray.push(location);
+            })
+    }
     </script>
-    
+     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyClKcWsgdYmlnLItSUiD5YaJgbrD9ahed4&callback=initMap">
+    </script>
 <h2>Search for an event.</h2>
 <form action="{% url 'search'%}" method="get">
   <input type="text" name="q">
@@ -48,11 +109,6 @@
     <input type="submit" value="Add to Schedule" /> {% endif %}
   </form>
 </div>
-
-  <script src="https://maps.googleapis.com/maps/api/js?callback=myMap"></script>
-  <script async defer src="https://maps.googleapis.com/maps/api/js?key={{API_Key}}&callback=initMap">
-  </script>
-
 </div>
 
 {% endfor %} {%endblock %}

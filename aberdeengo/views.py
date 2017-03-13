@@ -42,9 +42,22 @@ def searchEvents(request):
 def schedule(request):
     template = loader.get_template('schedule.html')
     user = CustomUser.objects.get(username=request.user.username)
+    events_no = range(1, len(user.schedule.scheduled_events())+1)
     context = RequestContext(request, {
-        'schedule' : user.schedule
+        'schedule' : user.schedule,
+        'indexes' : events_no
     })
+    if request.method == "POST":
+        travelType = request.POST.get('travel','')
+        entry_id = request.POST.get('entry_id','')
+        update_entry = ScheduleEntry.find_by_id(entry_id)
+        if request.POST.get('timeschanged','') == "1":
+            if request.POST.get('new_start_time','') != '':
+                update_entry.start = date(request.POST.get('new_start_time',''))
+            if request.POST.get('new_end_time','') != '':
+                update_entry.end = date(request.POST.get('new_end_time',''))
+        update_entry.travelType = travelType
+        update_entry.save()
     return HttpResponse(template.render(context,request))
     
 
@@ -280,4 +293,6 @@ def addPayment(request):
         }
         return HttpResponse(template.render(context, request))
     else:
-       return render(request,'ajax/addPayment.html')  
+       return render(request,'ajax/addPayment.html')
+
+

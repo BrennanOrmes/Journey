@@ -106,7 +106,6 @@ class Event(models.Model):
 
 class Schedule(models.Model):
     events = models.ManyToManyField(Event, through = 'ScheduleEntry')
-
     def add_event(self, newentry):
         """Add an event to this schedule if possible. If it cannot be added,
         an EventsClash exception is thrown"""
@@ -165,6 +164,7 @@ class ScheduleEntry(models.Model):
     schedule = models.ForeignKey(Schedule, on_delete=models.CASCADE)
     start = models.DateTimeField()
     end = models.DateTimeField()
+    travelType = models.CharField(max_length=255, default="DRIVING")
     
     def clashes_with(self, other):
         """Checks if this event overlaps with another event"""
