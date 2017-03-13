@@ -13,11 +13,14 @@ class Tag(models.Model):
     def num_events(self):
         return self.event_set.count()
 
+class Tag(models.Model):
+    name = models.CharField(max_length=255)
+    description = models.CharField(max_length=255)
+
 class CustomUser(User):
     payment = models.CharField(max_length=255)
     # 'Schedule' needs to be the class name rather than the object to prevent errors
     schedule = models.OneToOneField('Schedule', null=True) # null is temporary
-    interests = models.ManyToManyField(Tag)
     profilePicture = models.ImageField('pictures/profile/%Y/%m/%d', null=True)
 
     def is_active2(self):
@@ -34,7 +37,8 @@ class CustomUser(User):
     def is_new(self):
         threshold = datetime.timedelta(days=7)
         return (timezone.now() - self.date_joined) < threshold
-
+        
+    userInterests = models.ManyToManyField(Tag)
 
 class Location(models.Model):
     coordinates = models.FloatField(max_length=20) #momentarily not used
@@ -130,6 +134,12 @@ class Event(models.Model):
 
     def num_attendees(self):
         return self.schedule_set.count()
+
+class Vote(models.Model):
+    user = models.ForeignKey(CustomUser)
+    event = models.ForeignKey(Event)
+    interestScore = models.IntegerField(default = 0)
+    othersScore = models.IntegerField(default = 0)
 
 
 class Schedule(models.Model):

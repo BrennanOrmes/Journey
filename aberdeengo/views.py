@@ -19,17 +19,65 @@ from paypal.standard.ipn.signals import payment_was_successful
 from scripts.event import Event
 from scripts.schedule import Schedule, EventsClash, InconsistentTime
 from scripts.test import user_tags, date
+
 from .models import *
 
-from scripts.signup import *
+from scripts.recommendations import recommend_by_interest, recommend_by_other_users
 
-from .models import CustomUser, ScheduleEntry
+
+from scripts.signup import *
 
 # Create your views here. --> WHOOP
 
 @csrf_exempt
 def home(request):
-    return render(request,'index.html')
+    if request.user.is_anonymous():
+        return render(request,'index.html')
+    else:
+        currentUsername = request.user.username
+        currentUser = CustomUser.objects.get(username=currentUsername)
+        Vote.objects.filter(user=currentUser).delete()
+        for event in Event.objects.all():
+            v = Vote(user=currentUser, event=event, interestScore=0, othersScore=0)
+            v.save()
+        # events_by_interest = recommend_by_interest(currentUser)
+        # events_by_other_users = recommend_by_other_users(currentUser)
+        recommend_by_interest(currentUser)
+        recommend_by_other_users(currentUser)
+        votes = Vote.objects.filter(user = currentUser)
+        events_by_interest = []
+        events_by_other_users = []
+        # Vote.objects.filter(user__username=currentUsername).order_by('interestScore').reverse()
+        votes = votes.order_by('interestScore').reverse()
+        # voteInterest = Vote.objects.filter(user = currentUser)
+        voteInterest = votes.order_by('interestScore').reverse()
+        
+        for vote in votes:
+            for event in Event.objects.all():
+                if vote.event == event and vote.interestScore is not 0:
+                    events_by_interest.append(event)
+        
+        # Vote.objects.filter(user=currentUser).order_by('othersScore').reverse()
+        # voteOthers = Vote.objects.filter(user = currentUser)
+        
+        votes = votes.order_by('othersScore').reverse()
+        # voteInterest = Vote.objects.filter(user = currentUser)
+        voteOthers = votes.order_by('interestScore').reverse()
+        
+        for vote in votes:
+            for event in Event.objects.all():
+                if vote.event == event and vote.othersScore is not 0:
+                    events_by_other_users.append(event)
+        
+        template = loader.get_template('index.html')
+        context = RequestContext(request, {
+            'events_by_interest': events_by_interest,
+            'events_by_other_users': events_by_other_users,
+            'votes': votes,
+            'voteInterest': voteInterest,
+            'voteOthers': voteOthers
+        })
+        return HttpResponse(template.render(context,request))
     
 def contact(request):
     return render(request,'contact.html',  context)
@@ -231,8 +279,10 @@ def accounts(request, username):
 def editAccount(request):
     currentUsername = request.user.username
     currentUser = CustomUser.objects.get(username=currentUsername)
+    tags = currentUser.userInterests.all()
     context = {
         'user': currentUser,
+        'tags': tags
     }
     template = loader.get_template('ajax/profile.html')
     return HttpResponse(template.render(context, request))
@@ -250,7 +300,31 @@ def ownedEvents(request):
 
 @login_required()     
 def interests(request):
-    return render(request,'ajax/interests.html')
+    if request.method == 'POST':
+        currentUsername = request.user.username
+        currentUser = CustomUser.objects.get(username=currentUsername)
+        # for interest in currentUser.userInterests.all():
+        #     currentUser.userInterests.remove(interest)
+        currentUser.userInterests.clear()
+        tags = request.POST.getlist('tags[]',[])
+        for tag in tags:
+            currentUser.userInterests.add(tag)
+        template = loader.get_template('accounts.html')
+        context = {
+            'user': currentUser
+        }
+        return HttpResponse(template.render(context, request))
+    else:
+        currentUsername = request.user.username
+        currentUser = CustomUser.objects.get(username=currentUsername)
+        tags = Tag.objects.all()
+        # tags = list(set(Tag.objects.all()) - set(currentUser.userInterests.all()))
+        context = {
+            'tags': tags,
+            'user': currentUser
+        }
+        template = loader.get_template('ajax/interests.html')
+        return HttpResponse(template.render(context, request))
 
 @login_required()     
 def name(request):
@@ -268,7 +342,7 @@ def name(request):
         }
         return HttpResponse(template.render(context, request))
     else:
-       return render(request,'ajax/name.html')  
+        return render(request,'ajax/name.html')  
 
 @login_required
 def email(request):
