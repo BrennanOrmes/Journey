@@ -47,6 +47,7 @@ urlpatterns = patterns('',
     url(r'^addPayment/$', 'aberdeengo.views.addPayment', name='addPayment'),
     url(r'^pay/([0-9]+)$', 'aberdeengo.views.pay', name='pay'),
     url(r'^paypal/', include('paypal.standard.ipn.urls')),
+    url(r'^stats/$', 'aberdeengo.views.stats', name='stats')
 ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 

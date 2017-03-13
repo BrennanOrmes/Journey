@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
 import datetime
 from aberdeengo import settings
 
@@ -9,12 +10,31 @@ class Tag(models.Model):
     name = models.CharField(max_length=255)
     description = models.CharField(max_length=255)
 
+    def num_events(self):
+        return self.event_set.count()
+
 class CustomUser(User):
     payment = models.CharField(max_length=255)
     # 'Schedule' needs to be the class name rather than the object to prevent errors
     schedule = models.OneToOneField('Schedule', null=True) # null is temporary
     interests = models.ManyToManyField(Tag)
     profilePicture = models.ImageField('pictures/profile/%Y/%m/%d', null=True)
+
+    def is_active2(self):
+        ### GAH: overrides the is_active on regular users
+        ### should we be using the regular django is_active?
+        return self.num_created() > 0 or self.num_attending() > 0
+
+    def num_created(self):
+        return self.event_set.count()
+
+    def num_attending(self):
+        return self.schedule.events.count()
+
+    def is_new(self):
+        threshold = datetime.timedelta(days=7)
+        return (timezone.now() - self.date_joined) < threshold
+
 
 class Location(models.Model):
     coordinates = models.FloatField(max_length=20) #momentarily not used
@@ -105,6 +125,11 @@ class Event(models.Model):
         tags = set(tags)
         return not tags or tags.intersection(self.tags)
 
+    def is_attended(self):
+        return self.num_attendees() > 0
+
+    def num_attendees(self):
+        return self.schedule_set.count()
 
 
 class Schedule(models.Model):
@@ -193,3 +218,88 @@ class InconsistentTime(Exception):
 def between(x, y, z):
     "Returns true if x <= y <= z"
     return (x < y) and (y < z)
+
+
+class Summary(models.Model):
+    updated = models.DateTimeField(auto_now=True)
+    num_events = models.IntegerField()
+    num_attended = models.IntegerField()
+    most_attended = models.ForeignKey(Event)
+    num_active = models.IntegerField()
+    new_users = models.IntegerField(default=0)
+
+    @classmethod
+    def most_recent(self, force=False):
+        retval = Summary.objects.order_by('-updated').first()
+        if retval is None and force == True:
+            return Summary.now()
+        else:
+            return retval
+
+    @classmethod
+    def now(self):
+        s = Summary()
+        s.num_events = s._num_events()
+        s.num_attended = s._num_attended()
+        s.most_attended = s._most_attended()
+        s.num_active = s._num_active()
+        s.new_users = s._new_users()
+        s.save()
+        s._summarise_events()
+        s._summarise_tags()
+        s.save() # needed?
+        return s
+
+    def _num_events(self):
+        return Event.objects.count()
+
+    def _num_attended(self):
+        return len([event for event in self._events() if event.is_attended()])
+
+    def _most_attended(self):
+        return max(self._events(), key=lambda x: x.num_attendees())
+
+    def _num_active(self):
+        return len([user for user in self._users() if user.is_active2()])
+
+    def _new_users(self):
+        return (len([user for user in self._users() if user.is_new()]))
+
+    def _events(self):
+        return Event.objects.all()
+
+    def _users(self):
+        return CustomUser.objects.all()
+
+    def _tags(self):
+        return Tag.objects.all()
+
+    def _summarise_events(self):
+        for event in self._events():
+            n = event.num_attendees()
+            event_summary = EventSummary(event=event, num_attendees=n, summary=self)
+            event_summary.save()
+
+    def _summarise_tags(self):
+        for tag in self._tags():
+            n = tag.num_events()
+            tag_summary = TagSummary(tag=tag, num_events=n, summary=self)
+            tag_summary.save()
+
+class TagSummary(models.Model):
+    ## Nulls are temporary
+    updated = models.DateTimeField(auto_now=True)
+    tag = models.ForeignKey(Tag,null=True)
+    num_events = models.IntegerField(default=0)
+    summary = models.ForeignKey(Summary,null=True)
+
+class EventSummary(models.Model):
+    updated = models.DateTimeField(auto_now=True)
+    event = models.ForeignKey(Event,null=True) ## temporary
+    num_attendees = models.IntegerField(default=0)
+    summary = models.ForeignKey(Summary,null=True)
+
+# class UserSummary(models.Model):
+#     updated = models.DateTimeField(auto_now=True)
+#     user = models.ForeignKey(CustomUser)
+#     summary = models.ForeignKey(Summary)

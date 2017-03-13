@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.admin.views.decorators import staff_member_required
 
 from paypal.standard.forms import PayPalPaymentsForm
 from paypal.standard.models import ST_PP_COMPLETED
@@ -19,7 +20,6 @@ from scripts.event import Event
 from scripts.schedule import Schedule, EventsClash, InconsistentTime
 from scripts.test import user_tags, date
 from .models import *
-
 
 from scripts.signup import *
 
@@ -317,7 +317,7 @@ def addPayment(request):
         return HttpResponse(template.render(context, request))
     else:
        return render(request,'ajax/addPayment.html')  
-       
+
 def pay(request, id):
     paypal_dict = {
         "business": "teamalphaau@gmail.com",
@@ -346,3 +346,24 @@ def makePublic(sender, **kwargs):
 
 
 valid_ipn_received.connect(makePublic)
+
+# def upload(request):
+#     # Handle file upload
+#     if request.method == 'POST':
+#         form = DocumentForm(request.POST, request.FILES)
+#         if form.is_valid():
+#             currentUser.profilePicture = request.FILES['docfile']
+#             currentUser.save()
+#             return HttpResponseRedirect(reverse('accounts'))
+#     else:
+#         form = DocumentForm() 
+#     return render_to_response(
+#         'upload.html',
+#         { 'currentUser': currentUser,'form': form},
+#         context_instance=RequestContext(request)
+#     )
+
+# @staff_member_required
+def stats(request):
+    s = Summary.most_recent(force=True)
+    return render(request, 'stats.html', {'summary': s})
