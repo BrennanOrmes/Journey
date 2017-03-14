@@ -12,29 +12,26 @@
                    <h4>Sign up</h4> 
                     
                 </div>
-                                <div class="row" id="signupContent">
-                                    <div id="signForm">
-    <form method="post" action=".">{% csrf_token %}
-
-            <p> pick a username</p>
-            {{ form.username}} <br>
-            <p>{{ form.username.errors.as_text }}</p>
-            <p> enter your email</p>
-            {{ form.email}}<br>
-            <p>{{ form.email.errors.as_text }}</p>
-             <p> pick a password</p>
-            {{ form.password1}}<br>
-             <p> enter your password again</p>
-            {{ form.password2}}<br>
-            {% for error in form.non_field_errors %}
-            <p> {{error}}</p>
-            {% endfor %}
-            
-             <input type="submit" value="Register" />
-</div>
-       
-    </form>
-    </div>
+        <div class="row" id="signupContent">
+            <div id="signForm">
+                <form method="post" action=".">{% csrf_token %}
+                    <p> pick a username</p>
+                    {{ form.username}} <br>
+                    <p>{{ form.username.errors.as_text }}</p>
+                    <p> enter your email</p>
+                    {{ form.email}}<br>
+                    <p>{{ form.email.errors.as_text }}</p>
+                     <p> pick a password</p>
+                    {{ form.password1}}<br>
+                     <p> enter your password again</p>
+                    {{ form.password2}}<br>
+                    {% for error in form.non_field_errors %}
+                    <p> {{error}}</p>
+                    {% endfor %}
+                    <input type="submit" value="Register" />
+                    </form>
+            </div>
+        </div>
       </div>
     </div>
   

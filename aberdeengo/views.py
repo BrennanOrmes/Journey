@@ -80,16 +80,14 @@ def home(request):
         return HttpResponse(template.render(context,request))
     
 def contact(request):
-    return render(request,'contact.html',  context)
+    return render(request,'contact.html')
     
 def searchEvents(request):
     search_string = request.GET.get("q",'')
     events = Event.search(search_string, user_tags) #TODO: add limiting
     events.sort(key=lambda x: x.start_time)
     template = loader.get_template('search.html')
-    context = RequestContext(request,{
-        'events': events
-    })
+    context = {  'events': events }
     return HttpResponse(template.render(context,request))
 
 @login_required
@@ -97,10 +95,10 @@ def schedule(request):
     template = loader.get_template('schedule.html')
     user = CustomUser.objects.get(username=request.user.username)
     events_no = range(1, len(user.schedule.scheduled_events())+1)
-    context = RequestContext(request, {
+    context = {
         'schedule' : user.schedule,
         'indexes' : events_no
-    })
+    }
     if request.method == "POST":
         travelType = request.POST.get('travel','')
         entry_id = request.POST.get('entry_id','')
@@ -134,14 +132,14 @@ def event(request,id):
         username = request.user.username;
         user = CustomUser.objects.get(username=username)
         scheduled_events = user.schedule.scheduled_events()
-    context = RequestContext(request, {
+    context = {
         'event': event,
         'clashes' : clashes,
         'tags': tags,
         'inconsistentTime': inconsistentTime,
         'scheduled_events' : scheduled_events,
         'username' : username
-    })
+    }
     return HttpResponse(template.render(context,request))
     
     
@@ -418,24 +416,7 @@ def makePublic(sender, **kwargs):
     event.public = True
     event.save()
 
-
 valid_ipn_received.connect(makePublic)
-
-# def upload(request):
-#     # Handle file upload
-#     if request.method == 'POST':
-#         form = DocumentForm(request.POST, request.FILES)
-#         if form.is_valid():
-#             currentUser.profilePicture = request.FILES['docfile']
-#             currentUser.save()
-#             return HttpResponseRedirect(reverse('accounts'))
-#     else:
-#         form = DocumentForm() 
-#     return render_to_response(
-#         'upload.html',
-#         { 'currentUser': currentUser,'form': form},
-#         context_instance=RequestContext(request)
-#     )
 
 # @staff_member_required
 def stats(request):

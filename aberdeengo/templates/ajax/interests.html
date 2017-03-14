@@ -1,50 +1,49 @@
 <h1>interests</h1>
-    
-    <form id=""  method="post" action="{% url 'interests'%}"> {% csrf_token %}
-        <script>
-        function selectTag(select)
-        {
-          var option = select.options[select.selectedIndex];
-          var ul = select.parentNode.getElementsByTagName('ul')[0];
-     
-          var choices = ul.getElementsByTagName('input');
-          for (var i = 0; i < choices.length; i++)
-          if (choices[i].value == option.value)
-            return;
-     
-          var li = document.createElement('li');
-          var input = document.createElement('input');
-          var text = document.createTextNode(option.firstChild.data);
-     
-          input.type = 'hidden';
-          input.name = 'tags[]';
-          input.value = option.value;
 
-          li.appendChild(input);
-          li.appendChild(text);
-          li.setAttribute('onclick', 'this.parentNode.removeChild(this);');     
-    
-          ul.appendChild(li);
-          }
-        </script>
-    
-        <ul>
-          {% for interest in user.userInterests.all %}
-            <li onclick="this.parentNode.removeChild(this);">
-              <input type="hidden" name="tags[]" value="{{interest.id}}"/>{{interest.name}}
-            </li>
-          {% endfor %}
-        </ul>
-        <select onchange="selectTag(this);">
+<form id="" method="post" action="{% url 'interests'%}"> {% csrf_token %}
+  <script>
+    function selectTag(select) {
+      var option = select.options[select.selectedIndex];
+      var ul = select.parentNode.getElementsByTagName('ul')[0];
+
+      var choices = ul.getElementsByTagName('input');
+      for (var i = 0; i < choices.length; i++)
+        if (choices[i].value == option.value)
+          return;
+
+      var li = document.createElement('li');
+      var input = document.createElement('input');
+      var text = document.createTextNode(option.firstChild.data);
+
+      input.type = 'hidden';
+      input.name = 'tags[]';
+      input.value = option.value;
+
+      li.appendChild(input);
+      li.appendChild(text);
+      li.setAttribute('onclick', 'this.parentNode.removeChild(this);');
+
+      ul.appendChild(li);
+    }
+  </script>
+
+  <ul>
+    {% for interest in user.userInterests.all %}
+     <li onclick="this.parentNode.removeChild(this);">
+       <input type="hidden" name="tags[]" value="{{interest.id}}" />{{interest.name}}
+     </li>
+    {% endfor %}
+  </ul>
+  <select onchange="selectTag(this);">
         {% for tag in tags%}
-          <option value="{{tag.id}}">{{tag.name}}</option>
+           <option value="{{tag.id}}">{{tag.name}}</option>
         {% endfor %}
         </select>
 
-          <br>
-          <br>
-          <br>
-          <br>
-        
-        <input type="submit" value="save"/>
-        </form>
+  <br>
+  <br>
+  <br>
+  <br>
+
+  <input type="submit" value="save" />
+</form>
