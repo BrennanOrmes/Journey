@@ -82,6 +82,7 @@ class Event(models.Model):
     price = models.IntegerField(null=True)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, default=1)
     publication_date = models.DateField(("Date"), default=datetime.date.today)
+    range = models.IntegerField(default = 0)
 
     #tags = models.ManyToManyField(Tag)
     eventTags = models.ManyToManyField(Tag)

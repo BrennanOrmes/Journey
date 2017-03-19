@@ -32,6 +32,7 @@
                 <input type="submit" value="Add to Schedule" />
             {% endif %}
              <br><br>
+            {{event.range}}
         </form>
             {% if event.user.username == username and event.public == False %}
              <!--<br> <h4>  <a href="{% url 'pay' event.id %}">Make event public</a>  </h4>  -->

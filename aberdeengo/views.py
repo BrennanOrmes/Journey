@@ -405,11 +405,11 @@ def pay(request, id):
         payment = request.POST.get('pay','')
         
         if payment == "public":
-            paypal_dict["custom"] = 0
+            paypal_dict["custom"] = "0"
             paypal_dict["amount"] = "1.00"
             paypal_dict["item_name"] = "make event public"
         elif payment == "range1":
-            paypal_dict["custom"] = 1
+            paypal_dict["custom"] = "1"
             paypal_dict["amount"] = "1.50"
             paypal_dict["item_name"] = "Increase range of event"
 
@@ -423,9 +423,12 @@ def pay(request, id):
 
 def makePublic(sender, **kwargs):
     ipn_obj = sender
-    eventid = ipn_obj.custom
+    eventid = ipn_obj.item_number
     event = Event.find_by_id(int(eventid))
-    event.public = True
+    if ipn_obj.custom == "0":
+        event.public = True
+    elif ipn_obj.custom == "1":
+        event.range = 1
     event.save()
 
 valid_ipn_received.connect(makePublic)
