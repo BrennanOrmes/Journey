@@ -31,9 +31,22 @@
                 <input type="hidden" name="schedule" value="1" />
                 <input type="submit" value="Add to Schedule" />
             {% endif %}
+             <br><br>
         </form>
             {% if event.user.username == username and event.public == False %}
-             <br> <h4>  <a href="{% url 'pay' event.id %}">Make event public</a>  </h4>  
+             <!--<br> <h4>  <a href="{% url 'pay' event.id %}">Make event public</a>  </h4>  -->
+             <form action="{% url 'pay' event.id %}" method="post">
+                 {% csrf_token %}
+                 <input type="hidden" name="pay" value="public" />
+                   <input type="submit" value="Make event Public" />
+                 </form>
+            {% elif event.user.username == username and event.public == True %}
+            <!--<br> <h4>  <a href="{% url 'pay' event.id %}">increase range</a>  </h4>  -->
+            <form action="{% url 'pay' event.id %}" method="post">
+                {% csrf_token %}
+                 <input type="hidden" name="pay" value="range1" />
+                   <input type="submit" value="Increase range of event" />
+                 </form>
             {% endif %}
     </div>
     

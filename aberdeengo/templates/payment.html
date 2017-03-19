@@ -6,9 +6,16 @@
         
     </div>
      <div class="col-xs-6">
-         <h2> pay to make event public?</h2> <br>
+         {% if pay == "public" %}
+         <h2> pay to make event public?</h2>
+         {% elif pay == "range1" %}
+         <h2> increase range of event</h2>
+         {% else %}
+         <h2> Something went wrong, Please go back to the previous page</h2>
+         {% endif %}
+         <br>
         {{form.render}} <br>
-        <h2> don't pay to keep your event private </h2>
+        <h2> quit transaction</h2>
              <a href="{% url 'event' event.id %}">Back</a>
     </div>
     

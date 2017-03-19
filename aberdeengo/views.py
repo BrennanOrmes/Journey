@@ -391,23 +391,35 @@ def addPayment(request):
        return render(request,'ajax/addPayment.html')  
 
 def pay(request, id):
-    paypal_dict = {
-        "business": "teamalphaau@gmail.com",
-        "amount": "1.00",
-        "item_name": "make event public",
-        "currency_code": "GBP",
-        "invoice": "unique-invoice-id",
-        "notify_url": request.build_absolute_uri(reverse('paypal-ipn')),
-        "return_url": request.build_absolute_uri(reverse('home')),
-        "cancel_return": request.build_absolute_uri(reverse('contact')),
-        "custom": id
-    }
-    
-    # Create the instance.
-    event = Event.find_by_id(int(id))
-    form = PayPalPaymentsForm(initial=paypal_dict)
-    context = {"form": form, "event": event , "u":  request.build_absolute_uri(reverse('paypal-ipn')) }
-    return render(request, "payment.html", context)
+    if request.method == 'POST':
+        paypal_dict = {
+            "business": "teamalphaau@gmail.com",
+            "currency_code": "GBP",
+            "invoice": "unique-invoice-id",
+            "notify_url": request.build_absolute_uri(reverse('paypal-ipn')),
+            "return_url": request.build_absolute_uri(reverse('home')),
+            "cancel_return": request.build_absolute_uri(reverse('contact')),
+            "item_number": id,
+        }
+        
+        payment = request.POST.get('pay','')
+        
+        if payment == "public":
+            paypal_dict["custom"] = 0
+            paypal_dict["amount"] = "1.00"
+            paypal_dict["item_name"] = "make event public"
+        elif payment == "range1":
+            paypal_dict["custom"] = 1
+            paypal_dict["amount"] = "1.50"
+            paypal_dict["item_name"] = "Increase range of event"
+
+        # Create the instance.
+        event = Event.find_by_id(int(id))
+        form = PayPalPaymentsForm(initial=paypal_dict)
+        context = {"form": form, "event": event , "pay" : payment }
+        return render(request, "payment.html", context)
+    else:
+        raise Http404("Page not found")
 
 def makePublic(sender, **kwargs):
     ipn_obj = sender
