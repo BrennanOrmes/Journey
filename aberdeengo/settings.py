@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'gunicorn',
     'geopy',
     'paypal.standard.ipn',
+    'social_django',
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -58,6 +59,7 @@ MIDDLEWARE_CLASSES = [
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'social_django.middleware.SocialAuthExceptionMiddleware',
 ]
 
 ROOT_URLCONF = 'aberdeengo.urls'
@@ -73,6 +75,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'social_django.context_processors.backends',
+                'social_django.context_processors.login_redirect',
             ],
         },
     },
@@ -143,3 +147,32 @@ MEDIA_URL = '/media/'
 LOGIN_REDIRECT_URL = '/'
 
 PAYPAL_TEST = True
+
+# Third Party Authentication
+
+AUTHENTICATION_BACKENDS = (
+    'social_core.backends.github.GithubOAuth2',
+    'social_core.backends.twitter.TwitterOAuth',
+    'social_core.backends.facebook.FacebookOAuth2',
+
+    'django.contrib.auth.backends.ModelBackend',
+)
+
+LOGIN_URL = 'signup'
+
+SOCIAL_AUTH_USER_MODEL='aberdeengo.CustomUser'
+
+# These should not be included in the repo, but I will be deactivating
+# them once the project is over -- ian
+SOCIAL_AUTH_GITHUB_KEY = '71f19e676290eda57272'
+SOCIAL_AUTH_GITHUB_SECRET = 'b994e3a56615114e94baa9394cb8217016b14a3f'
+
+SOCIAL_AUTH_TWITTER_KEY = 'WPKLOAms1pICsPMVePDL3GRyC'
+SOCIAL_AUTH_TWITTER_SECRET = 'oMwsj1UZZpFBu4hnWKw3IS3ZKYTKiHtqEBW4B5DL5EgmJTOVLt'
+
+SOCIAL_AUTH_FACEBOOK_KEY = '1887901581485923'
+SOCIAL_AUTH_FACEBOOK_SECRET = '33cc79f9cdaedb66c30adbc93c62f814'
+
+SOCIAL_AUTH_LOGIN_ERROR_URL = '/accounts/'
+SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/accounts/'
+SOCIAL_AUTH_RAISE_EXCEPTIONS = False

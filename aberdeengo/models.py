@@ -1,9 +1,8 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, UserManager
 from django.utils import timezone
 import datetime
 from aberdeengo import settings
-
 
 
 class Tag(models.Model):
@@ -13,11 +12,24 @@ class Tag(models.Model):
     def num_events(self):
         return self.event_set.count()
 
+
 class Tag(models.Model):
     name = models.CharField(max_length=255)
     description = models.CharField(max_length=255)
 
+
+class CustomUserManager(UserManager):
+    def _create_user(self, username, email, password, **extra_fields):
+        if 'schedule' not in extra_fields:
+            s = Schedule()
+            s.save()
+            extra_fields['schedule'] = s
+        return super(CustomUserManager, self)._create_user(username, email, password, **extra_fields)
+
+
 class CustomUser(User):
+    objects = CustomUserManager() #overrides manager
+
     payment = models.CharField(max_length=255)
     # 'Schedule' needs to be the class name rather than the object to prevent errors
     schedule = models.OneToOneField('Schedule', null=True) # null is temporary

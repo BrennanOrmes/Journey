@@ -22,6 +22,7 @@ from . import views
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+from django.contrib.auth import views as auth_views
 
 urlpatterns = patterns('',
 
@@ -47,7 +48,8 @@ urlpatterns = patterns('',
     url(r'^addPayment/$', 'aberdeengo.views.addPayment', name='addPayment'),
     url(r'^pay/([0-9]+)$', 'aberdeengo.views.pay', name='pay'),
     url(r'^paypal/', include('paypal.standard.ipn.urls')),
-    url(r'^stats/$', 'aberdeengo.views.stats', name='stats')
+    url(r'^stats/$', 'aberdeengo.views.stats', name='stats'),
+    url(r'^oauth/', include('social_django.urls', namespace='social')),
 ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 
