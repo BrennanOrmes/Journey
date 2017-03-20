@@ -1,5 +1,6 @@
 from ..models import CustomUser, Event, Vote
 from django.db.models import F
+import operator
 
 def recommend_by_interest(user):
     recommendations = []
@@ -25,3 +26,15 @@ def recommend_by_other_users(user):
                         Vote.objects.filter(user=user).filter(event=otherEvent).update(othersScore = 1)
                     elif otherEvent not in user.schedule.events.all() and otherEvent in recommendations:
                         Vote.objects.filter(user=user).filter(event=otherEvent).update(othersScore=F('othersScore') + 1)
+                        
+def featured():
+    featuredevents = []
+    events = Event.objects.all()
+    for event in events:
+        if event.range > event.num_attendees:
+            featuredevents.append((event, event.range - event.num_attendees()))
+    featuredevents = sorted(featuredevents, key=lambda x: x[1])
+    events = []
+    for event in featuredevents:
+            events.append(event[0]) 
+    return events

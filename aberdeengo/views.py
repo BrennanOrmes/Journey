@@ -22,7 +22,7 @@ from scripts.test import user_tags, date
 
 from .models import *
 
-from scripts.recommendations import recommend_by_interest, recommend_by_other_users
+from scripts.recommendations import recommend_by_interest, recommend_by_other_users, featured
 
 
 from scripts.signup import *
@@ -32,7 +32,13 @@ from scripts.signup import *
 @csrf_exempt
 def home(request):
     if request.user.is_anonymous():
-        return render(request,'index.html')
+        events = []
+        events = featured()
+        template = loader.get_template('index.html')
+        context = RequestContext(request, {
+            'events': events
+        })
+        return HttpResponse(template.render(context,request))
     else:
         currentUsername = request.user.username
         currentUser = CustomUser.objects.get(username=currentUsername)
@@ -58,7 +64,7 @@ def home(request):
         
         for vote in votes:
             for event in Event.objects.all():
-                if vote.event == event and vote.othersScore is not 0:
+                if vote.event == event and vote.othersScore is not 0 and vote.interestScore == 0:
                     events_by_other_users.append(event)
         
         template = loader.get_template('index.html')
