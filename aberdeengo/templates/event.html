@@ -1,4 +1,48 @@
 {% extends "layout.html" %}
+{% block head_content %}
+    <script type="text/javascript" src="//cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script type="text/javascript" src="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.js"></script>
+    <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.css" />
+    <script type="text/javascript">
+      $(document).ready(function() {
+        var options = {
+          timePicker : true,
+          timePickerIncrement : 1,
+          // timePicker24Hour : true,
+          // autoApply : true,
+          locale: {
+            format: 'DD/MM/YYYY h:mm A'
+          }
+        };
+        
+        var pyformat = "YYYY-MM-DDTHH:mm:ssZZ";
+        
+        $('input[name="daterange"]').daterangepicker(options);
+        $('input[name="daterange"]').on('apply.daterangepicker', function (ev, picker) {
+
+          $('#formA input[name="new_start_time"]').val(picker.startDate.format(pyformat));
+          $('#formA input[name="new_end_time"]').val(picker.endDate.format(pyformat));
+        });
+
+        $('#formA').submit(function () {
+          $('input[name="daterange"]', this).prop('disabled', true);
+            return true;
+        });
+
+        var start = moment("{{ event.start_time|date:'c' }}");
+        var end   = moment("{{ event.end_time|date:'c' }}");
+
+        // Set Hidden Values
+        $('#formA input[name="new_start_time"]').val(start.format(pyformat));
+        $('#formA input[name="new_end_time"]').val(end.format(pyformat));
+
+        // Set Date Picker
+        $('#formA input[name="daterange"]').data('daterangepicker').setStartDate(start);
+        $('#formA input[name="daterange"]').data('daterangepicker').setEndDate(end);
+
+      });
+    </script>
+{% endblock %}
 {% block content %}
 
 <div class="row"> 
@@ -17,17 +61,18 @@
         {% for tag in event.eventTags.all %}
             <p>{{tag.name}}</p>
         {% endfor %}
-        <form action="{% url 'scheduleevent' %}" method="post">
+        <form action="{% url 'scheduleevent' %}" method="post" id="formA">
             {% csrf_token %}
             <input type="hidden" name="event_id" value="{{ event.id }}" /> 
             {% if event in scheduled_events %}
                 <input type="hidden" name="schedule" value="0" />
                 <input type="submit" value="Remove from Schedule" />
             {% elif not clashes %}
-                <label for="title">Going from:</label>
-                <input type="text" id="new_start_time" name="new_start_time" placeholder="2016-11-25T12:00:00">
-                <label for="title">Leaving at:</label>
-                <input type="text" id="new_end_time" name="new_end_time" placeholder="2016-11-25T12:00:00">
+				<br>
+                <label for="daterange">Restrict Duration</label>
+                <input type="text" name="daterange" id="daterange" /><br>
+                <input type="hidden" id="new_start_time" name="new_start_time">
+                <input type="hidden" id="new_end_time" name="new_end_time">
                 <input type="hidden" name="schedule" value="1" />
                 <input type="submit" value="Add to Schedule" />
             {% endif %}
