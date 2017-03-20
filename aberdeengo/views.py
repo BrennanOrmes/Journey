@@ -249,7 +249,7 @@ def logout(request):
         return redirect(login)
 
 @login_required() 
-def accounts(request, username):
+def accounts(request, username=None):
     currentUsername = request.user.username
     currentUser = CustomUser.objects.get(username=currentUsername)
     if request.method == 'POST':
