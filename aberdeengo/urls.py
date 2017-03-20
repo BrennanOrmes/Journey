@@ -17,6 +17,7 @@ Including another URLconf
 from django.conf.urls import url, patterns, include
 from django.contrib import admin
 from django.views.generic.detail import DetailView
+from haystack.views import SearchView
 from models import CustomUser
 from . import views
 from django.conf import settings
@@ -32,7 +33,7 @@ urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
     url(r'^home/$', aberdeengo.views.home, name='home'),
     url(r'^$',aberdeengo.views.home, name='home'),
-    url(r'^search/$',aberdeengo.views.searchEvents, name='search'),
+    url(r'^search/$', SearchView(), name='search'), #TODO: don't hardcode results_per_page=5
     url(r'^contact/$',aberdeengo.views.contact, name='contact'),
     url(r'^schedule/$',aberdeengo.views.schedule, name='schedule'),
     url(r'^event/([0-9]+)$',aberdeengo.views.event, name='event'), #TODO: change urls to event/eventname+number

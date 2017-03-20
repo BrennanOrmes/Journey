@@ -1,0 +1,121 @@
+{% extends "layout.html" %} {% block content %}
+{% comment %}
+<div id="map" style="width:100%;height:500px;"></div>
+
+        <script>
+          function initMap() {
+        var map = new google.maps.Map(document.getElementById('map'), {
+          center: {lat: -34.397, lng: 150.644},
+          zoom: 13
+        });
+        var infoWindow = new google.maps.InfoWindow({map: map});
+
+        // Try HTML5 geolocation.
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(function(position) {
+            var pos = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude
+            };
+
+            infoWindow.setPosition(pos);
+            infoWindow.setContent('You are here.');
+            map.setCenter(pos);
+          }, function() {
+            handleLocationError(true, infoWindow, map.getCenter());
+          });
+        } else {
+          // Browser doesn't support Geolocation
+          handleLocationError(false, infoWindow, map.getCenter());
+        }
+        {% for event in events %}
+        placeMarker(map, "{{event.title}}", "{{event.location}}", "{% url 'event' event.id %}");
+        {% endfor %}
+      }
+
+      function handleLocationError(browserHasGeolocation, infoWindow, pos) {
+        infoWindow.setPosition(pos);
+        infoWindow.setContent(browserHasGeolocation ?
+                              'Error: The Geolocation service failed.' :
+                              'Error: Your browser doesn\'t support geolocation.');
+      }
+      
+    function placeMarker(map, title, location , url) {
+            var marker = new google.maps.Marker({
+              position: location,
+              map: map
+            });
+            
+            var infowindow = new google.maps.InfoWindow({
+              content: "<a href=\"" + url +"\">" + title + "</a>"
+            });
+    }
+    </script>
+{% endcomment %}
+<h2>Search for an event.</h2>
+
+<form method="get" action=".">
+    <table>
+        {{ form.as_table }}
+        <tr>
+            <td>&nbsp;</td>
+            <td>
+                <input type="submit" value="Search">
+            </td>
+        </tr>
+    </table>
+    
+    {% if query %}
+      <h3>Results</h3>
+      {% for result in page.object_list %}
+        {# Note: You need result.object to get the Event object, result is an EventIndex object #}
+        {% with result.object as event %}
+        <div class="col-xs-6 col-lg-4">
+          <h2><a href="{% url 'event' event.id %}">{{ event.title }}</a></h2>
+          {% if clashes %}
+          <div class="alert-warning" role="alert">Clashes with <a href="{% url 'event' clashes.id%}">{{clashes.title}}</a></div>
+          {% endif %}
+          <p>From: {{ event.start_time|date:"D d M Y P" }}</p>
+          <p>To: {{ event.end_time|date:"D d M Y P" }}</p>
+          <p>Description: {{ event.description }}</p>
+          <p>Tags:</p>
+          {% for tag in event.eventTags.all %}
+          <p>{{tag.name}}</p>
+          {% endfor %}
+          <form action="{% url 'scheduleevent' %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="event_id" value="{{ event.id }}" /> {% if event in scheduled_events %}
+            <input type="hidden" name="schedule" value="0" />
+            <input type="submit" value="Remove from Schedule" /> {% elif not clashes %}
+            <input type="hidden" name="schedule" value="1" />
+            <input type="submit" value="Add to Schedule" /> {% endif %}
+          </form>
+        </div>
+        {% endwith %}
+      {% empty %}
+        <p>No results found.</p>
+      {% endfor %}
+      
+      {# The following links to the previous or next pages if there is more than one page of results #}
+      {% if page.has_previous or page.has_next %}
+        <div>
+            {% if page.has_previous %}<a href="?q={{ query }}&amp;page={{ page.previous_page_number }}">{% endif %}
+            &laquo; Previous {% if page.has_previous %}</a>{% endif %}
+            |
+            {% if page.has_next %}<a href="?q={{ query }}&amp;page={{ page.next_page_number }}">{% endif %}
+            Next &raquo;{% if page.has_next %}</a>{% endif %}
+        </div>
+      {% endif %}
+  {% else %}
+    {# Show some example queries to run, maybe query syntax, something else? #}
+  {% endif %}
+</form>
+
+  <!-- TODO: Brennan: should this be in each result or just at the end? -->
+  <script src="https://maps.googleapis.com/maps/api/js?callback=myMap"></script>
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key={{API_Key}}&callback=initMap">
+  </script>
+
+</div>
+
+{%endblock %}

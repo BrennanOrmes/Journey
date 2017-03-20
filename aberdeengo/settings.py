@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'paypal.standard.ipn',
     'social_django',
+    'haystack',
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -174,3 +175,14 @@ SOCIAL_AUTH_FACEBOOK_SECRET = '33cc79f9cdaedb66c30adbc93c62f814'
 SOCIAL_AUTH_LOGIN_ERROR_URL = '/accounts/'
 SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/accounts/'
 SOCIAL_AUTH_RAISE_EXCEPTIONS = False
+
+# Search
+
+HAYSTACK_CONNECTIONS = {
+    'default': {
+        'ENGINE': 'haystack.backends.whoosh_backend.WhooshEngine',
+        'PATH': os.path.join(BASE_DIR, 'whoosh_index'),
+    },
+}
+
+HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
