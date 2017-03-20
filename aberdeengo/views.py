@@ -19,6 +19,7 @@ from paypal.standard.ipn.signals import payment_was_successful
 from scripts.event import Event
 from scripts.schedule import Schedule, EventsClash, InconsistentTime
 from scripts.test import user_tags, date
+from scripts.social import get_social_context
 
 from .models import *
 
@@ -36,6 +37,7 @@ def home(request):
     else:
         currentUsername = request.user.username
         currentUser = CustomUser.objects.get(username=currentUsername)
+        print "WAZ", type(currentUser), currentUsername, currentUser.schedule
         Vote.objects.filter(user=currentUser).delete()
         for event in Event.objects.all():
             v = Vote(user=currentUser, event=event, interestScore=0, othersScore=0)
@@ -213,14 +215,11 @@ def signup(request):
         form = RegistrationForm(request.POST)
       
         if form.is_valid():
-            s = Schedule()
-            s.save()
             user = CustomUser.objects.create_user(
             username=form.cleaned_data['username'],
             password=form.cleaned_data['password1'],
             email=form.cleaned_data['email'],
             payment = 'none',
-            schedule = s,
             )
             user = authenticate(username=form.cleaned_data['username'], password=form.cleaned_data['password1'])
             login(request, user)
@@ -267,6 +266,7 @@ def accounts(request, username):
         'events': events,
         'form': form
         }
+        context.update(get_social_context(request.user))
         return render_to_response(
         'accounts.html',
         context,

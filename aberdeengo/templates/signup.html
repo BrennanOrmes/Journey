@@ -29,7 +29,12 @@
                     <p> {{error}}</p>
                     {% endfor %}
                     <input type="submit" value="Register" />
-                    </form>
+
+                    <p><strong>-- Or --</strong></p>
+                    <a href="{% url 'social:begin' 'github' %}">Login with GitHub</a><br>
+                    <a href="{% url 'social:begin' 'twitter' %}">Login with Twitter</a><br>
+                    <a href="{% url 'social:begin' 'facebook' %}">Login with Facebook</a><br>
+                </form>
             </div>
         </div>
       </div>
