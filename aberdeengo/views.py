@@ -40,16 +40,12 @@ def home(request):
         for event in Event.objects.all():
             v = Vote(user=currentUser, event=event, interestScore=0, othersScore=0)
             v.save()
-        # events_by_interest = recommend_by_interest(currentUser)
-        # events_by_other_users = recommend_by_other_users(currentUser)
         recommend_by_interest(currentUser)
         recommend_by_other_users(currentUser)
         votes = Vote.objects.filter(user = currentUser)
         events_by_interest = []
         events_by_other_users = []
-        # Vote.objects.filter(user__username=currentUsername).order_by('interestScore').reverse()
         votes = votes.order_by('interestScore').reverse()
-        # voteInterest = Vote.objects.filter(user = currentUser)
         voteInterest = votes.order_by('interestScore').reverse()
         
         for vote in votes:
@@ -57,11 +53,7 @@ def home(request):
                 if vote.event == event and vote.interestScore is not 0:
                     events_by_interest.append(event)
         
-        # Vote.objects.filter(user=currentUser).order_by('othersScore').reverse()
-        # voteOthers = Vote.objects.filter(user = currentUser)
-        
         votes = votes.order_by('othersScore').reverse()
-        # voteInterest = Vote.objects.filter(user = currentUser)
         voteOthers = votes.order_by('interestScore').reverse()
         
         for vote in votes:
