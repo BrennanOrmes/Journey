@@ -2,18 +2,14 @@
 from __future__ import unicode_literals
 from schedule import Schedule, InconsistentTime
 from event import Event
+from django.utils.dateparse import parse_datetime
 from datetime import datetime
 import pytz
 import re
 #from .models import Events
 
 def date(s):
-    try:
-        unaware = datetime.strptime(s,"%Y-%m-%dT%H:%M:%S")
-        now_aware = pytz.utc.localize(unaware)
-        return now_aware
-    except ValueError:
-        raise InconsistentTime(s, "just plain wrong m8")
+    return parse_datetime(s)
 
 
 # Test Data
