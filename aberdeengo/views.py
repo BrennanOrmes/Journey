@@ -22,7 +22,7 @@ from scripts.test import user_tags, date
 
 from .models import *
 
-from scripts.recommendations import recommend_by_interest, recommend_by_other_users
+from scripts.recommendations import recommend_by_interest, recommend_by_other_users, featured
 
 
 from scripts.signup import *
@@ -32,7 +32,13 @@ from scripts.signup import *
 @csrf_exempt
 def home(request):
     if request.user.is_anonymous():
-        return render(request,'index.html')
+        events = []
+        events = featured()
+        template = loader.get_template('index.html')
+        context = RequestContext(request, {
+            'events': events
+        })
+        return HttpResponse(template.render(context,request))
     else:
         currentUsername = request.user.username
         currentUser = CustomUser.objects.get(username=currentUsername)
@@ -40,16 +46,12 @@ def home(request):
         for event in Event.objects.all():
             v = Vote(user=currentUser, event=event, interestScore=0, othersScore=0)
             v.save()
-        # events_by_interest = recommend_by_interest(currentUser)
-        # events_by_other_users = recommend_by_other_users(currentUser)
         recommend_by_interest(currentUser)
         recommend_by_other_users(currentUser)
         votes = Vote.objects.filter(user = currentUser)
         events_by_interest = []
         events_by_other_users = []
-        # Vote.objects.filter(user__username=currentUsername).order_by('interestScore').reverse()
         votes = votes.order_by('interestScore').reverse()
-        # voteInterest = Vote.objects.filter(user = currentUser)
         voteInterest = votes.order_by('interestScore').reverse()
         
         for vote in votes:
@@ -57,16 +59,12 @@ def home(request):
                 if vote.event == event and vote.interestScore is not 0:
                     events_by_interest.append(event)
         
-        # Vote.objects.filter(user=currentUser).order_by('othersScore').reverse()
-        # voteOthers = Vote.objects.filter(user = currentUser)
-        
         votes = votes.order_by('othersScore').reverse()
-        # voteInterest = Vote.objects.filter(user = currentUser)
         voteOthers = votes.order_by('interestScore').reverse()
         
         for vote in votes:
             for event in Event.objects.all():
-                if vote.event == event and vote.othersScore is not 0:
+                if vote.event == event and vote.othersScore is not 0 and vote.interestScore == 0:
                     events_by_other_users.append(event)
         
         template = loader.get_template('index.html')
