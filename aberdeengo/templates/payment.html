@@ -3,12 +3,21 @@
 
 <div class="row">
     <div class="col-xs-3">
-        
+        {{value}}
     </div>
      <div class="col-xs-6">
-         <h2> pay to make event public?</h2> <br>
+         {% if pay == "range1" %}
+         <h2> pay here to boost the range of the event for £1.50</h2>
+         {% elif pay == "range2" %}
+         <h2> pay here to boost the range of the event for £3</h2>
+         {% elif pay == "range3" %}
+         <h2> pay here to boost the range of the event for £5</h2>
+         {% else %}
+         <h2> pay here to make the event public for £1</h2>
+         {% endif %}
+         <br>
         {{form.render}} <br>
-        <h2> don't pay to keep your event private </h2>
+        <h2> quit transaction</h2>
              <a href="{% url 'event' event.id %}">Back</a>
     </div>
     

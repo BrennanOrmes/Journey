@@ -19,6 +19,9 @@
 		<!--{% endfor %}-->
 	{% else %}
 		<p>Featured events</p>
+		{% for event in events %}
+			<p><a href="{% url 'event' event.id %}">{{event.title}}</a></p>
+		{% endfor %}
 	{% endif %}
 
 

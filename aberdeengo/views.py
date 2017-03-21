@@ -23,7 +23,7 @@ from scripts.social import get_social_context
 
 from .models import *
 
-from scripts.recommendations import recommend_by_interest, recommend_by_other_users
+from scripts.recommendations import recommend_by_interest, recommend_by_other_users, featured
 
 
 from scripts.signup import *
@@ -33,7 +33,13 @@ from scripts.signup import *
 @csrf_exempt
 def home(request):
     if request.user.is_anonymous():
-        return render(request,'index.html')
+        events = []
+        events = featured()
+        template = loader.get_template('index.html')
+        context = RequestContext(request, {
+            'events': events
+        })
+        return HttpResponse(template.render(context,request))
     else:
         currentUsername = request.user.username
         currentUser = CustomUser.objects.get(username=currentUsername)
@@ -42,16 +48,12 @@ def home(request):
         for event in Event.objects.all():
             v = Vote(user=currentUser, event=event, interestScore=0, othersScore=0)
             v.save()
-        # events_by_interest = recommend_by_interest(currentUser)
-        # events_by_other_users = recommend_by_other_users(currentUser)
         recommend_by_interest(currentUser)
         recommend_by_other_users(currentUser)
         votes = Vote.objects.filter(user = currentUser)
         events_by_interest = []
         events_by_other_users = []
-        # Vote.objects.filter(user__username=currentUsername).order_by('interestScore').reverse()
         votes = votes.order_by('interestScore').reverse()
-        # voteInterest = Vote.objects.filter(user = currentUser)
         voteInterest = votes.order_by('interestScore').reverse()
         
         for vote in votes:
@@ -59,16 +61,12 @@ def home(request):
                 if vote.event == event and vote.interestScore is not 0:
                     events_by_interest.append(event)
         
-        # Vote.objects.filter(user=currentUser).order_by('othersScore').reverse()
-        # voteOthers = Vote.objects.filter(user = currentUser)
-        
         votes = votes.order_by('othersScore').reverse()
-        # voteInterest = Vote.objects.filter(user = currentUser)
         voteOthers = votes.order_by('interestScore').reverse()
         
         for vote in votes:
             for event in Event.objects.all():
-                if vote.event == event and vote.othersScore is not 0:
+                if vote.event == event and vote.othersScore is not 0 and vote.interestScore == 0:
                     events_by_other_users.append(event)
         
         template = loader.get_template('index.html')
@@ -393,28 +391,54 @@ def addPayment(request):
 def pay(request, id):
     paypal_dict = {
         "business": "teamalphaau@gmail.com",
-        "amount": "1.00",
-        "item_name": "make event public",
         "currency_code": "GBP",
         "invoice": "unique-invoice-id",
         "notify_url": request.build_absolute_uri(reverse('paypal-ipn')),
-        "return_url": request.build_absolute_uri(reverse('home')),
-        "cancel_return": request.build_absolute_uri(reverse('contact')),
-        "custom": id
+        "return_url": request.build_absolute_uri(reverse('event', args=[id])),
+        "cancel_return": request.build_absolute_uri(reverse('event', args=[id])),
+        "item_number": id,
     }
+    payment = request.POST.get('pay','')
     
+    if payment == "range1":
+        paypal_dict["custom"] = "1"
+        paypal_dict["amount"] = "1.50"
+        paypal_dict["item_name"] = "Increase range of event"
+    elif payment == "range2":
+        paypal_dict["custom"] = "2"
+        paypal_dict["amount"] = "3"
+        paypal_dict["item_name"] = "Increase range of event"
+    elif payment == "range3":
+        paypal_dict["custom"] = "3"
+        paypal_dict["amount"] = "5"
+        paypal_dict["item_name"] = "Increase range of event"
+    else:
+        paypal_dict["custom"] = "0"
+        paypal_dict["amount"] = "1.00"
+        paypal_dict["item_name"] = "make event public"
+    
+
     # Create the instance.
     event = Event.find_by_id(int(id))
     form = PayPalPaymentsForm(initial=paypal_dict)
-    context = {"form": form, "event": event , "u":  request.build_absolute_uri(reverse('paypal-ipn')) }
+    context = {"form": form, "event": event , "pay" : payment, }
     return render(request, "payment.html", context)
 
 def makePublic(sender, **kwargs):
     ipn_obj = sender
-    eventid = ipn_obj.custom
+    eventid = ipn_obj.item_number
     event = Event.find_by_id(int(eventid))
-    event.public = True
+    if ipn_obj.custom == "0":
+        event.public = True
+    elif ipn_obj.custom == "1":
+        event.range = 50
+    elif ipn_obj.custom == "2":
+        event.range = 100
+    elif ipn_obj.custom == "3":
+        event.range = 250
     event.save()
+    return redirect(event, id)
+    
 
 valid_ipn_received.connect(makePublic)
 

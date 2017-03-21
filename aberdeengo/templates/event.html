@@ -76,9 +76,44 @@
                 <input type="hidden" name="schedule" value="1" />
                 <input type="submit" value="Add to Schedule" />
             {% endif %}
+             <br><br>
         </form>
             {% if event.user.username == username and event.public == False %}
-             <br> <h4>  <a href="{% url 'pay' event.id %}">Make event public</a>  </h4>  
+             <form action="{% url 'pay' event.id %}" method="post">
+                 {% csrf_token %}
+                 <input type="hidden" name="pay" value="public" />
+                   <input type="submit" value="Make event Public" />
+                 </form>
+            {% elif event.user.username == username and event.public == True %}
+            <!--<br> <h4>  <a href="{% url 'pay' event.id %}">increase range</a>  </h4>  -->
+            <h4> Your current event booster is {{event.range}}</h4>
+                
+                {% if event.range < 250 %}
+            <h4> boost the amount of people who will see your event. </h4>
+                
+                    {% if event.range < 50 %}
+            <form action="{% url 'pay' event.id %}" method="post">
+                {% csrf_token %}
+                 <input type="hidden" name="pay" value="range1" />
+                   <input type="submit" value="Boost range by 50 people " />
+                   <b> £1.50</b>
+                 </form>
+                     {% endif %}
+                     {% if event.range < 100 %}
+            <form action="{% url 'pay' event.id %}" method="post">
+                {% csrf_token %}
+                 <input type="hidden" name="pay" value="range2" />
+                   <input type="submit" value="Boost range by 100 people " />
+                   <b> £3</b>
+                 </form>
+                      {% endif %}
+            <form action="{% url 'pay' event.id %}" method="post">
+                {% csrf_token %}
+                 <input type="hidden" name="pay" value="range3" />
+                   <input type="submit" value="Boost range by 250 people " />
+                   <b> £5</b>
+                 </form>
+                 {%endif%}
             {% endif %}
     </div>
     
