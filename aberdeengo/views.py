@@ -391,35 +391,40 @@ def addPayment(request):
        return render(request,'ajax/addPayment.html')  
 
 def pay(request, id):
-    if request.method == 'POST':
-        paypal_dict = {
-            "business": "teamalphaau@gmail.com",
-            "currency_code": "GBP",
-            "invoice": "unique-invoice-id",
-            "notify_url": request.build_absolute_uri(reverse('paypal-ipn')),
-            "return_url": request.build_absolute_uri(reverse('home')),
-            "cancel_return": request.build_absolute_uri(reverse('contact')),
-            "item_number": id,
-        }
-        
-        payment = request.POST.get('pay','')
-        
-        if payment == "public":
-            paypal_dict["custom"] = "0"
-            paypal_dict["amount"] = "1.00"
-            paypal_dict["item_name"] = "make event public"
-        elif payment == "range1":
-            paypal_dict["custom"] = "1"
-            paypal_dict["amount"] = "1.50"
-            paypal_dict["item_name"] = "Increase range of event"
-
-        # Create the instance.
-        event = Event.find_by_id(int(id))
-        form = PayPalPaymentsForm(initial=paypal_dict)
-        context = {"form": form, "event": event , "pay" : payment }
-        return render(request, "payment.html", context)
+    paypal_dict = {
+        "business": "teamalphaau@gmail.com",
+        "currency_code": "GBP",
+        "invoice": "unique-invoice-id",
+        "notify_url": request.build_absolute_uri(reverse('paypal-ipn')),
+        "return_url": request.build_absolute_uri(reverse('event', args=[id])),
+        "cancel_return": request.build_absolute_uri(reverse('event', args=[id])),
+        "item_number": id,
+    }
+    payment = request.POST.get('pay','')
+    
+    if payment == "range1":
+        paypal_dict["custom"] = "1"
+        paypal_dict["amount"] = "1.50"
+        paypal_dict["item_name"] = "Increase range of event"
+    elif payment == "range2":
+        paypal_dict["custom"] = "2"
+        paypal_dict["amount"] = "3"
+        paypal_dict["item_name"] = "Increase range of event"
+    elif payment == "range3":
+        paypal_dict["custom"] = "3"
+        paypal_dict["amount"] = "5"
+        paypal_dict["item_name"] = "Increase range of event"
     else:
-        raise Http404("Page not found")
+        paypal_dict["custom"] = "0"
+        paypal_dict["amount"] = "1.00"
+        paypal_dict["item_name"] = "make event public"
+    
+
+    # Create the instance.
+    event = Event.find_by_id(int(id))
+    form = PayPalPaymentsForm(initial=paypal_dict)
+    context = {"form": form, "event": event , "pay" : payment, }
+    return render(request, "payment.html", context)
 
 def makePublic(sender, **kwargs):
     ipn_obj = sender
@@ -428,8 +433,14 @@ def makePublic(sender, **kwargs):
     if ipn_obj.custom == "0":
         event.public = True
     elif ipn_obj.custom == "1":
-        event.range = 1
+        event.range = 50
+    elif ipn_obj.custom == "2":
+        event.range = 100
+    elif ipn_obj.custom == "3":
+        event.range = 250
     event.save()
+    return redirect(event, id)
+    
 
 valid_ipn_received.connect(makePublic)
 
