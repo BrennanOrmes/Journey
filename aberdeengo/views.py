@@ -9,6 +9,7 @@ from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.admin.views.decorators import staff_member_required
+from django.utils.crypto import get_random_string
 
 from paypal.standard.forms import PayPalPaymentsForm
 from paypal.standard.models import ST_PP_COMPLETED
@@ -138,7 +139,8 @@ def event(request,id):
         'tags': tags,
         'inconsistentTime': inconsistentTime,
         'scheduled_events' : scheduled_events,
-        'username' : username
+        'username' : username,
+        'tickets' : event.max_tickets - event.sold_tickets
     }
     return HttpResponse(template.render(context,request))
     
@@ -264,7 +266,7 @@ def accounts(request, username=None):
         'events': events,
         'form': form
         }
-        context.update(get_social_context(request.user))
+        # context.update(get_social_context(request.user))
         return render_to_response(
         'accounts.html',
         context,
@@ -388,6 +390,7 @@ def addPayment(request):
     else:
        return render(request,'ajax/addPayment.html')  
 
+@login_required
 def pay(request, id):
     paypal_dict = {
         "business": "teamalphaau@gmail.com",
@@ -399,6 +402,7 @@ def pay(request, id):
         "item_number": id,
     }
     payment = request.POST.get('pay','')
+    event = Event.find_by_id(int(id))
     
     if payment == "range1":
         paypal_dict["custom"] = "1"
@@ -412,22 +416,31 @@ def pay(request, id):
         paypal_dict["custom"] = "3"
         paypal_dict["amount"] = "5"
         paypal_dict["item_name"] = "Increase range of event"
-    else:
+    elif payment == "public":
         paypal_dict["custom"] = "0"
         paypal_dict["amount"] = "1.00"
         paypal_dict["item_name"] = "make event public"
+    elif payment == "ticket":
+        paypal_dict["custom"] = request.user.username
+        paypal_dict["amount"] = str(event.price)
+        paypal_dict["item_name"] = "buy ticket for" + " " + str(event.title)
+    else:
+        paypal_dict["custom"] = "666"
+        paypal_dict["amount"] = "0.00"
+        paypal_dict["item_name"] = "Something went wrong, please go back"
     
 
     # Create the instance.
-    event = Event.find_by_id(int(id))
     form = PayPalPaymentsForm(initial=paypal_dict)
     context = {"form": form, "event": event , "pay" : payment, }
     return render(request, "payment.html", context)
 
-def makePublic(sender, **kwargs):
+def handlePayment(sender, **kwargs):
     ipn_obj = sender
     eventid = ipn_obj.item_number
-    event = Event.find_by_id(int(eventid))
+    currentUsername = ipn_obj.custom
+    
+    e = Event.find_by_id(int(eventid))
     if ipn_obj.custom == "0":
         event.public = True
     elif ipn_obj.custom == "1":
@@ -436,13 +449,33 @@ def makePublic(sender, **kwargs):
         event.range = 100
     elif ipn_obj.custom == "3":
         event.range = 250
-    event.save()
+    elif ipn_obj.custom == "666":
+        return redirect(event, id)
+    else:
+        string = currentUsername + "-" +  get_random_string(length=16)
+        currentUser = CustomUser.objects.get(username=currentUsername)
+        t = Ticket(currentUser, string, id)
+        e.sold_tickets +=1
+        e.save()
+        return redirect(contact) 
+        
+    e.save()
     return redirect(event, id)
     
 
-valid_ipn_received.connect(makePublic)
+valid_ipn_received.connect(handlePayment)
 
 # @staff_member_required
 def stats(request):
     s = Summary.most_recent(force=True)
     return render(request, 'stats.html', {'summary': s})
+    
+    
+def createticket(request,id):
+    if request.method == 'POST':
+        currentEvent = Event.find_by_id(id)
+        currentEvent.max_tickets = request.POST.get('number','')
+        currentEvent.price = request.POST.get('price','')
+        currentEvent.save()
+        return redirect(event,id)
+    return render(request,'createTickets.html', {'id': id})  

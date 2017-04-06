@@ -84,6 +84,11 @@ class LocationTag(models.Model):
 
 
 
+class Ticket(models.Model):
+    user = models.OneToOneField(CustomUser, null=True)
+    code = models.CharField(max_length=255)
+    eventId = models.IntegerField(default = 0)
+
 class Event(models.Model):
     title = models.CharField(max_length=255)
     start_time = models.DateTimeField()
@@ -91,20 +96,19 @@ class Event(models.Model):
     location = models.CharField(max_length=255) # models.ForeignKey(Location, on_delete=models.CASCADE)
     description = models.CharField(max_length=255)
     public = models.BooleanField(default=False)
-    price = models.IntegerField(null=True)
+    price = models.FloatField(null=True)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, default=1)
     publication_date = models.DateField(("Date"), default=datetime.date.today)
     range = models.IntegerField(default = 0)
+    max_tickets = models.IntegerField(default = 0)
+    sold_tickets = models.IntegerField(default = 0)
+
 
     #tags = models.ManyToManyField(Tag)
     eventTags = models.ManyToManyField(Tag)
     # def add_tags(self, newentry):
     #     tags = self.tags.all()
     
-    
-    #cost
-    # owner
-    #wtf?? why are there two events classes????? <3 ruben
 
     def customise(self, start_time=False, end_time=False, transport=False):
         """Returns a customised object for this event"""

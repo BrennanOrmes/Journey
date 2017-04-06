@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<form id="" action="{% url 'createticket' id %}" method="post"> {% csrf_token %}
+  <p> Enter quantity of tickets</p>
+  <input type="number" name="number" min="1" required><br>
+  <p> Enter price of ticket in pounds</p>
+  £ <input type="number" name="price" step="0.50" min="0.50" required><br>
+  <input type="submit" value="save" />
+</form>
+
+{%endblock%}

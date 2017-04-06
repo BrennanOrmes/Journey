@@ -54,6 +54,8 @@ urlpatterns = patterns('',
     url(r'^paypal/', include('paypal.standard.ipn.urls')),
     url(r'^stats/$', aberdeengo.views.stats, name='stats'),
     url(r'^oauth/', include('social_django.urls', namespace='social')),
+    url(r'^createticket/([0-9]+)$', aberdeengo.views.createticket, name='createticket'),
+    # url(r'^ticket/$', views.change_password, name='change_password'),
 ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 

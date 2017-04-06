@@ -3,7 +3,6 @@
 
 <div class="row">
     <div class="col-xs-3">
-        {{value}}
     </div>
      <div class="col-xs-6">
          {% if pay == "range1" %}
@@ -12,8 +11,12 @@
          <h2> pay here to boost the range of the event for £3</h2>
          {% elif pay == "range3" %}
          <h2> pay here to boost the range of the event for £5</h2>
-         {% else %}
+         {% elif pay == "public" %}
          <h2> pay here to make the event public for £1</h2>
+         {% elif pay == "ticket" %}
+         <h2> pay here for a ticket for {{event.title}} for £{{event.price}}</h2>
+         {% else %}
+         <h2> Something went wrong, please go back to the previous page</h2>
          {% endif %}
          <br>
         {{form.render}} <br>
