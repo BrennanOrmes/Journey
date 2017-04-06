@@ -1,12 +1,22 @@
 {% extends "layout.html" %}
 {% block content %}
 
-<form id="" action="{% url 'createticket' id %}" method="post"> {% csrf_token %}
+<h2> manage tickets here </h2>
+<form id="" action="{% url 'createticket' id %}" method="post"> 
+{% csrf_token %}
   <p> Enter quantity of tickets</p>
   <input type="number" name="number" min="1" required><br>
   <p> Enter price of ticket in pounds</p>
   £ <input type="number" name="price" step="0.50" min="0.50" required><br>
   <input type="submit" value="save" />
 </form>
+
+
+<h2> list of all purchased tickets</h2> <a href="{% url 'event' id %}">back</a>
+<ul>
+  {% for t in ticket %}
+  <li>  {{ t.code }}  </li>
+  {% endfor %}
+</ul>
 
 {%endblock%}

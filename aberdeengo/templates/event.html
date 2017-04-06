@@ -119,7 +119,7 @@
                 <br>
                 <form action="{% url 'createticket' event.id %}" method="get">
                      {% csrf_token %}
-                       <input type="submit" value="Create tickets" />
+                       <input type="submit" value="Manage tickets" />
                 </form>
             {% endif%}
             {% if tickets > 0 %}

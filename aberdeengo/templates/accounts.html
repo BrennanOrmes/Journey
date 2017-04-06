@@ -30,13 +30,15 @@
         <div class="row" id="linkrow">
            <div class="col-xs-9"></div>
            <div class="col-xs-3">
-                 <a id="profile" data="{% url 'editAccount' %}">
+               <b>  <a id="profile" data="{% url 'editAccount' %}">
                profile
-            </a> 
-            <a id="events" data="{% url 'ownedEvents' %}">
+            </a> </b>
+            <b><a id="events" data="{% url 'ownedEvents' %}">
                events
-            </a>
-            </ul>
+            </a></b>
+            <b><a id="tickets" data="{% url 'ticketlist' %}">
+               tickets
+            </a></b>
            </div>
         </div>
         <div class="row" id="main-content"></div>

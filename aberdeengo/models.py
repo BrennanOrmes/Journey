@@ -81,13 +81,7 @@ class EventTag(models.Model):
 class LocationTag(models.Model):
     event = models.ForeignKey(Location, on_delete=models.CASCADE)
     tag = models.ForeignKey(Tag, on_delete=models.CASCADE)
-
-
-
-class Ticket(models.Model):
-    user = models.OneToOneField(CustomUser, null=True)
-    code = models.CharField(max_length=255)
-    eventId = models.IntegerField(default = 0)
+    
 
 class Event(models.Model):
     title = models.CharField(max_length=255)
@@ -151,6 +145,11 @@ class Event(models.Model):
 
     def num_attendees(self):
         return self.schedule_set.count()
+        
+class Ticket(models.Model):
+    user = models.ForeignKey(CustomUser, null=True, blank=True)
+    event = models.ForeignKey(Event, null=True, blank=True)
+    code = models.CharField(max_length=255)
 
 class Vote(models.Model):
     user = models.ForeignKey(CustomUser)

@@ -5,6 +5,13 @@ $("#profile").click(function(event) {
     });
 });
 
+$("#tickets").click(function(event) {
+    var target = $(this).attr("data");
+    $("#main-content").load(target, function() {
+         
+    });
+});
+
 
 $("#events").click(function(event) {
     var target = $(this).attr("data");

@@ -437,30 +437,31 @@ def pay(request, id):
 
 def handlePayment(sender, **kwargs):
     ipn_obj = sender
-    eventid = ipn_obj.item_number
-    currentUsername = ipn_obj.custom
+    eventid = int(ipn_obj.item_number)
+    e = Event.find_by_id(eventid)
     
-    e = Event.find_by_id(int(eventid))
     if ipn_obj.custom == "0":
-        event.public = True
+        e.public = True
     elif ipn_obj.custom == "1":
-        event.range = 50
+        e.range = 50
     elif ipn_obj.custom == "2":
-        event.range = 100
+        e.range = 100
     elif ipn_obj.custom == "3":
-        event.range = 250
+        e.range = 250
     elif ipn_obj.custom == "666":
-        return redirect(event, id)
+        return redirect(event, eventid)
     else:
-        string = currentUsername + "-" +  get_random_string(length=16)
-        currentUser = CustomUser.objects.get(username=currentUsername)
-        t = Ticket(currentUser, string, id)
         e.sold_tickets +=1
         e.save()
-        return redirect(contact) 
+        currentUsername = str(ipn_obj.custom)
+        currentUser = CustomUser.objects.get(username=currentUsername)
+        string =  currentUsername + "-" +  get_random_string(length=16)
+        t = Ticket(user = currentUser, event = e,code = string)
+        t.save()
+        return redirect(event, int(eventid))
         
     e.save()
-    return redirect(event, id)
+    return redirect(event, int(eventid))
     
 
 valid_ipn_received.connect(handlePayment)
@@ -472,10 +473,28 @@ def stats(request):
     
     
 def createticket(request,id):
+    currentEvent = Event.find_by_id(id)
     if request.method == 'POST':
-        currentEvent = Event.find_by_id(id)
         currentEvent.max_tickets = request.POST.get('number','')
         currentEvent.price = request.POST.get('price','')
         currentEvent.save()
         return redirect(event,id)
-    return render(request,'createTickets.html', {'id': id})  
+    ticket =  Ticket.objects.filter(event = currentEvent)
+    return render(request,'createTickets.html', {'id': id, 'ticket': ticket})  
+
+def ticketlist(request):
+    currentUsername = request.user.username
+    currentUser = CustomUser.objects.get(username=currentUsername)
+    tickets = Ticket.objects.filter(user=currentUser)
+    context = { 'tickets': tickets }
+    template = loader.get_template('ajax/ticketlist.html')
+    return HttpResponse(template.render(context, request))
+    
+def ticket(request, id):
+    if request.method == 'POST':
+        ticket = Ticket.objects.get(id=id)
+        context = { 'ticket': ticket}
+        template = loader.get_template('ticket.html')
+        return HttpResponse(template.render(context, request))  
+    else:
+        return redirect(home)
