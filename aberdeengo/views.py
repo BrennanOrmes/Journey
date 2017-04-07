@@ -163,10 +163,7 @@ def addEvent(request):
         e.save()
         for tag in tags:
              e.eventTags.add(tag)
-        if public == "True":
-            return redirect("pay", e.id)
-        else:
-            return redirect('event', e.id)
+        return redirect('event', e.id)
     else:
         tags = Tag.objects.all()
         template = loader.get_template('addevent.html')
@@ -424,6 +421,7 @@ def pay(request, id):
         paypal_dict["custom"] = request.user.username
         paypal_dict["amount"] = str(event.price)
         paypal_dict["item_name"] = "buy ticket for" + " " + str(event.title)
+        paypal_dict["business"] = event.user.email
     else:
         paypal_dict["custom"] = "666"
         paypal_dict["amount"] = "0.00"
