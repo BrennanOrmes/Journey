@@ -1,0 +1,11 @@
+<h2> your purchased tickets</h2>
+
+
+<ul>
+  {% for t in tickets %}
+  <li>  <form action="{% url 'ticket' t.id %}" method="post">
+                    {% csrf_token %}
+                       <input type="submit" value="{{t.event.title}}" /> 
+                     </form>  </li>
+  {% endfor %}
+</ul>
