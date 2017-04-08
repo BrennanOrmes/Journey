@@ -400,7 +400,7 @@ def pay(request, id):
     }
     payment = request.POST.get('pay','')
     event = Event.find_by_id(int(id))
-    
+    name = str(request.user.username)
     if payment == "range1":
         paypal_dict["custom"] = "1"
         paypal_dict["amount"] = "1.50"
@@ -418,7 +418,7 @@ def pay(request, id):
         paypal_dict["amount"] = "1.00"
         paypal_dict["item_name"] = "make event public"
     elif payment == "ticket":
-        paypal_dict["custom"] = request.user.username
+        paypal_dict["custom"] = name
         paypal_dict["amount"] = str(event.price)
         paypal_dict["item_name"] = "buy ticket for" + " " + str(event.title)
         paypal_dict["business"] = event.user.email
