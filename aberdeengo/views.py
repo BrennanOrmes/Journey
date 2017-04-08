@@ -356,18 +356,20 @@ def email(request):
        return render(request,'ajax/email.html')  
 
 def change_password(request):
+    form = PasswordChangeForm(user=request.user)
     if request.method == 'POST':
-        form = PasswordChangeForm(request.user, request.POST)
+        form = PasswordChangeForm(user=request.user, data=request.POST)
         if form.is_valid():
-            user = form.save()
-            update_session_auth_hash(request, user)  # Important!
+            name = request.user.username
+            form.save()
+            update_session_auth_hash(request, form.user)  # Important!
             messages.success(request, 'Your password was successfully updated!')
-            return redirect('accounts:change_password')
+            return HttpResponseRedirect('/accounts/'+ name)
         else:
             messages.error(request, 'Please correct the error below.')
     else:
         form = PasswordChangeForm(request.user)
-    return render(request, 'ajax/changeP.html', {
+    return render(request, 'changeP.html', {
         'form': form
     })
     
