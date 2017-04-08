@@ -24,10 +24,11 @@
     email: {{ user.email }}  <input id="mailButton" type="submit" value="change" data="{% url 'email' %}" />
     
     <br> 
-    
-    change password: <input id="passwordButton" type="submit" value="change"  data="{% url 'change_password' %}"/>
-    
     <br>
+        <form action="{% url 'change_password' %}" method="get">
+     change password:<input type="submit" value="change" />
+    </form>
+
     <br>
     
     {% if user.payment == "" %}
