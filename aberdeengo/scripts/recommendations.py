@@ -31,8 +31,8 @@ def featured():
     featuredevents = []
     events = Event.objects.all()
     for event in events:
-        if event.range > event.num_attendees:
-            featuredevents.append((event, event.range - event.num_attendees()))
+        if event.public is True and event.range > event.num_attendees():
+            featuredevents.append((event, event.num_attendees() - event.range))
     featuredevents = sorted(featuredevents, key=lambda x: x[1])
     events = []
     for event in featuredevents:

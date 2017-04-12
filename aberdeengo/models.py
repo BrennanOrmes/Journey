@@ -96,6 +96,8 @@ class Event(models.Model):
     range = models.IntegerField(default = 0)
     max_tickets = models.IntegerField(default = 0)
     sold_tickets = models.IntegerField(default = 0)
+    recurrence = models.IntegerField(default = 0)
+    times = models.IntegerField(default = 1)
 
 
     #tags = models.ManyToManyField(Tag)
@@ -145,6 +147,21 @@ class Event(models.Model):
 
     def num_attendees(self):
         return self.schedule_set.count()
+        
+class RecurrentEventManager(models.Manager):
+    def get_query_set(self):
+        return self.filter(recurrence__gt=1)
+
+class RecurrentEvent(Event):
+    class Meta:
+        proxy = True
+    objects = RecurrentEventManager()
+    
+class EventOccurence(models.Model):
+    event = models.ForeignKey(Event)
+    start_date = models.DateTimeField()
+    end_date = models.DateTimeField()
+
         
 class Ticket(models.Model):
     user = models.ForeignKey(CustomUser, null=True, blank=True)

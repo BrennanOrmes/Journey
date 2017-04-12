@@ -140,7 +140,16 @@
 				<!--{% endfor %}-->
 				<!--<br>-->
 				<br>
-          
+				<label for="recurrence">Recurrence</label>
+				<br>
+				<input type="radio" name="recurrence" value="0" checked="">None
+				<input type="radio" name="recurrence" value="1">Daily
+				<input type="radio" name="recurrence" value="7">Weekly
+				<input type="radio" name="recurrence" value="14">Biweekly
+				<br>
+				<label for="times">Number of times</label>
+				<br>
+        <input type="number" name="times" min="2" max="100" value="2">
     
     
         <script>

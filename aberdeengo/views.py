@@ -16,6 +16,7 @@ from paypal.standard.models import ST_PP_COMPLETED
 from paypal.standard.ipn.signals import valid_ipn_received
 from django.views.decorators.csrf import csrf_exempt
 from paypal.standard.ipn.signals import payment_was_successful
+from datetime import timedelta
 
 from scripts.event import Event
 from scripts.schedule import Schedule, EventsClash, InconsistentTime
@@ -36,9 +37,13 @@ def home(request):
     if request.user.is_anonymous():
         events = []
         events = featured()
+        recurrent = RecurrentEvent.objects.filter(recurrence__gt=0)
+        recurrences = EventOccurence.objects.all()
         template = loader.get_template('index.html')
         context = RequestContext(request, {
-            'events': events
+            'events': events,
+            'recurrent': recurrent,
+            'recurrences': recurrences
         })
         return HttpResponse(template.render(context,request))
     else:
@@ -133,6 +138,10 @@ def event(request,id):
         username = request.user.username;
         user = CustomUser.objects.get(username=username)
         scheduled_events = user.schedule.scheduled_events()
+    if event.recurrence > 0:
+        occurences = EventOccurence.objects.filter(event=event)
+    else:
+        occurences = []
     context = {
         'event': event,
         'clashes' : clashes,
@@ -140,7 +149,8 @@ def event(request,id):
         'inconsistentTime': inconsistentTime,
         'scheduled_events' : scheduled_events,
         'username' : username,
-        'tickets' : event.max_tickets - event.sold_tickets
+        'tickets' : event.max_tickets - event.sold_tickets,
+        'occurences': occurences
     }
     return HttpResponse(template.render(context,request))
     
@@ -158,12 +168,25 @@ def addEvent(request):
         user = CustomUser.objects.get(username=currentUsername)
         tags = request.POST.getlist('tags[]',[])
         public = request.POST.get('public','')
+        recurrence = int(request.POST.get('recurrence', ''))
+        times = int(request.POST.get('times',''))
         cost = 0
-        e = Event(title=title, start_time=start_time, end_time=end_time, location=location, description=description, price=cost, user=user)
+        e = Event(title=title, start_time=start_time, end_time=end_time, location=location, description=description, price=cost, user=user, recurrence=recurrence)
         e.save()
         for tag in tags:
              e.eventTags.add(tag)
-        return redirect('event', e.id)
+        # date1 = start_time.date()
+        # start_time = start_time + start_time.timedelta(days = recurrence)
+        if times >= 2:
+            for n in range(0,times):
+                o = EventOccurence(event=e,start_date=start_time, end_date=end_time)
+                o.save()
+                start_time = start_time + timedelta(days = recurrence)
+                end_time = end_time + timedelta(days = recurrence)
+        if public == "True":
+            return redirect("pay", e.id)
+        else:
+            return redirect('event', e.id)
     else:
         tags = Tag.objects.all()
         template = loader.get_template('addevent.html')
@@ -171,6 +194,7 @@ def addEvent(request):
             'tags': tags
         })
         return HttpResponse(template.render(context,request))
+
 
 @login_required
 def schedule_event(request):

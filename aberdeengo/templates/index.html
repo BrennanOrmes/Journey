@@ -20,7 +20,14 @@
 	{% else %}
 		<p>Featured events</p>
 		{% for event in events %}
-			<p><a href="{% url 'event' event.id %}">{{event.title}}</a></p>
+			<p><a href="{% url 'event' event.id %}">{{event.title}}</a> Attendees = {{event.num_attendees}} Range = {{event.range}}</p>
+		{% endfor %}
+		<p>Recurrent events</p>
+		{% for r in recurrent %}
+			<p><a href="{% url 'event' r.id %}">{{r.title}}</a> {{r.recurrence}}</p>
+		{% endfor %}
+		{% for rec in recurrences %}
+			<p><a href="{% url 'event' rec.event.id %}">{{rec.start_date}} {{rec.end_date}}</a> {{rec.event.title}}</p>
 		{% endfor %}
 	{% endif %}
 

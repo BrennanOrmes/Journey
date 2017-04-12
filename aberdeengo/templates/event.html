@@ -128,7 +128,16 @@
                      <input type="hidden" name="pay" value="ticket" />
                        <input type="submit" value="buy tickets" /> : {{tickets}} left at £{{event.price}} each
                      </form>
-            {% endif%}
+            {% endif %}
+            <p>Public = {{event.public}}</p>
+            <p>Event Range = {{event.range}}</p>
+            <p>Attendees = {{event.num_attendees}}</p>
+            
+            {% if event.recurrence > 0 %}
+            {% for occurence in occurences %}
+                <p>{{occurence.start_date}} {{occurence.end_date}}</p>
+            {% endfor %}
+            {% endif %}
     </div>
     
     <div class="col-xs-6">
