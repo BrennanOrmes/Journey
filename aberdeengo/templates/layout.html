@@ -25,7 +25,21 @@
 {% load static %}
    <link rel="stylesheet" href="{% static "customCSS/layoutStyle.css" %}">  
   {% block head_content %} {% endblock %}
-
+    <style>
+      .clickable {
+        cursor: pointer;
+      }
+      .schedules {
+        margin-left:-15px;
+        margin-right:-15px;
+        padding: 0px;
+        padding-top:20px !important;
+      }
+      .navbar-inverse {
+        background-color:pink !important;
+      
+      }
+    </style>
 </head>
 
 <body>

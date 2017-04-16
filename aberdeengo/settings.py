@@ -25,7 +25,7 @@ SECRET_KEY = 'hu&)bdmx#l4^kzuat-g%juyqqd!$7+uy8vu5%c1_y#ug(s*d&('
 
 #Google API Key DO NOT DELETE!
 
-API_Key = 'AIzaSyClKcWsgdYmlnLItSUiD5YaJgbrD9ahed4'
+API_KEY = 'AIzaSyClKcWsgdYmlnLItSUiD5YaJgbrD9ahed4'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True

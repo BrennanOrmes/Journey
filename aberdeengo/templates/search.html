@@ -1,5 +1,15 @@
 {% extends "layout.html" %}
 {% block head_content %}
+
+<!--
+    search.html - Contains functions for displaying the events and loads the google maps API in, displaying events, location etc.
+    Author: Team Alpha
+    
+    Tested?: Yes
+    Functional?: Yes           
+    Merged?: Yes
+    Copyright: (c) 2016 Team Alpha, University of Aberdeen.
+-->
     <script type="text/javascript" src="//cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
     <script type="text/javascript" src="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.js"></script>
     <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.css" />
@@ -46,12 +56,15 @@
 {% block content %}
 <div id="map" style="width:100%;height:500px;"></div>
     <script>
+    // Create marker Array
     markerArray = []
+      // Create google map to be displayed on page.
       function initMap() {
         var map = new google.maps.Map(document.getElementById('map'), {
           center: {lat: -34.397, lng: 150.644},
           zoom: 13
         });
+        // Window to pop up on marker
         var infoWindow = new google.maps.InfoWindow({map: map});
 
         // Try HTML5 geolocation.
@@ -72,6 +85,7 @@
           // Browser doesn't support Geolocation
           handleLocationError(false, infoWindow, map.getCenter());
         }
+        // Add a marker for each event
         {% for event in events %}
         placeMarker(map, "{{event.title}}", "{{event.location}}", "{% url 'event' event.id %}");
         {% endfor %}
@@ -89,8 +103,9 @@
                               'Error: The Geolocation service failed.' :
                               'Error: Your browser doesn\'t support geolocation.');
       }
-      
+    // Function for placing markers.
     function placeMarker(map, title, location , url) {
+            // This takes the location string from the databse and converts it into a readable format for google maps to take in.
             var input = location.substring(1, location.length-1);
             var latlngStr = input.split(",",2);
             var lat = parseFloat(latlngStr[0]);
