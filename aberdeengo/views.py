@@ -139,9 +139,15 @@ def event(request,id):
         user = CustomUser.objects.get(username=username)
         scheduled_events = user.schedule.scheduled_events()
     if event.recurrence > 0:
-        occurences = EventOccurence.objects.filter(event=event)
+        sameGroup = []
+        g = event.group
+        for e in Event.objects.filter(group=g):
+            # if e.group == g:
+            if e != event:
+                sameGroup.append(e)
     else:
-        occurences = []
+        sameGroup = []
+    length = len(sameGroup)
     context = {
         'event': event,
         'clashes' : clashes,
@@ -150,7 +156,8 @@ def event(request,id):
         'scheduled_events' : scheduled_events,
         'username' : username,
         'tickets' : event.max_tickets - event.sold_tickets,
-        'occurences': occurences
+        'sameGroup': sameGroup,
+        'length': length
     }
     return HttpResponse(template.render(context,request))
     
@@ -171,18 +178,20 @@ def addEvent(request):
         recurrence = int(request.POST.get('recurrence', ''))
         times = int(request.POST.get('times',''))
         cost = 0
-        e = Event(title=title, start_time=start_time, end_time=end_time, location=location, description=description, price=cost, user=user, recurrence=recurrence)
-        e.save()
-        for tag in tags:
-             e.eventTags.add(tag)
-        # date1 = start_time.date()
-        # start_time = start_time + start_time.timedelta(days = recurrence)
-        if times >= 2:
+        if recurrence > 0:
+            g = GroupOfEvents(title=title)
+            g.save()
             for n in range(0,times):
-                o = EventOccurence(event=e,start_date=start_time, end_date=end_time)
-                o.save()
+                e = Event(title=title, start_time=start_time, end_time=end_time, location=location, description=description, price=cost, user=user, recurrence=recurrence, group=g)
+                e.save()
+                for tag in tags:
+                    e.eventTags.add(tag)
                 start_time = start_time + timedelta(days = recurrence)
                 end_time = end_time + timedelta(days = recurrence)
+        # e = Event(title=title, start_time=start_time, end_time=end_time, location=location, description=description, price=cost, user=user, recurrence=recurrence)
+        # e.save()
+        # for tag in tags:
+            #  e.eventTags.add(tag)
         if public == "True":
             return redirect("pay", e.id)
         else:

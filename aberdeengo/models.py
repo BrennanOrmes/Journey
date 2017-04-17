@@ -81,14 +81,16 @@ class EventTag(models.Model):
 class LocationTag(models.Model):
     event = models.ForeignKey(Location, on_delete=models.CASCADE)
     tag = models.ForeignKey(Tag, on_delete=models.CASCADE)
-    
+
+class GroupOfEvents(models.Model):
+    title = models.CharField(max_length=255)
 
 class Event(models.Model):
     title = models.CharField(max_length=255)
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
     location = models.CharField(max_length=255) # models.ForeignKey(Location, on_delete=models.CASCADE)
-    description = models.CharField(max_length=255)
+    description = models.CharField(max_length=255, default = '')
     public = models.BooleanField(default=False)
     price = models.FloatField(null=True)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, default=1)
@@ -98,6 +100,7 @@ class Event(models.Model):
     sold_tickets = models.IntegerField(default = 0)
     recurrence = models.IntegerField(default = 0)
     times = models.IntegerField(default = 1)
+    group = models.ForeignKey(GroupOfEvents, default=0)
 
 
     #tags = models.ManyToManyField(Tag)

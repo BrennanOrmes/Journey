@@ -129,15 +129,7 @@
                        <input type="submit" value="buy tickets" /> : {{tickets}} left at £{{event.price}} each
                      </form>
             {% endif %}
-            <p>Public = {{event.public}}</p>
-            <p>Event Range = {{event.range}}</p>
-            <p>Attendees = {{event.num_attendees}}</p>
             
-            {% if event.recurrence > 0 %}
-            {% for occurence in occurences %}
-                <p>{{occurence.start_date}} {{occurence.end_date}}</p>
-            {% endfor %}
-            {% endif %}
     </div>
     
     <div class="col-xs-6">
@@ -198,9 +190,21 @@
         
     </div>
     
+    
+    
     <script src="https://maps.googleapis.com/maps/api/js?callback=myMap"></script>
     <script async defer src="https://maps.googleapis.com/maps/api/js?key={{API_Key}}&callback=initMap"> </script>
 
 </div>
+{% if length > 0 %}
+<p>This event is a recurrent one. Would you like to check out the other dates as well?</p>
+{% for e in sameGroup %}
+    <a href="{% url 'event' e.id %}">
+            <p>{{e.title}}</p>
+            <p>{{e.start_time}}</p>
+            <br>
+    </a>
+{% endfor %}
+{% endif %}
 
 {%endblock %}
