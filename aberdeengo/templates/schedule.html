@@ -195,14 +195,14 @@
         <ul class="schedules">
           <!--is this fixed?-->
         {# FIXME: this shows all events even those that are past #} 
-        {% for part_taking in schedule.scheduled_events %}
-        <div class="col-xs-12 col-lg-4 col-md-4">
+        <div class="grid" data-isotope='{ "itemSelector": ".grid-item", "layoutMode": "masonry" }'>
+          {% for part_taking in schedule.scheduled_events %}
+          <div class="grid-item">
           <div class="panel panel-default">
             <!--<a href="{% url 'event' part_taking.event.id %}">-->
             <div class="panel-heading clickable" onclick="location.href='{% url 'event' part_taking.event.id %}'">
               {{part_taking.event.title}}
             </div>
-            
           <div class="panel-body">
             
         <p>From: {{ part_taking.start|date:"D d M Y P" }}</p>
@@ -228,12 +228,27 @@
          
         </form>
         </div>
-        {% endfor %}
-          </div>
         </div>
-        
+        </div>
+        {% endfor %}
+        </div>
         
         </ul>
 
+<script type="text/javascript">
+  /* global $ */
+  /* global event */
+  
+  event.ready(function (event) {
+    event.evens.bind('loaded', function (event) {
+      $('.grid').isotope({
+        itemSelector: '.grid-item',
+        masonry: {
+          fitWidth: true
+        }
+      });
+    });
+  });
+</script>
 <!--End Tags-->
 {% endblock %}
