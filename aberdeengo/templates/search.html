@@ -134,8 +134,13 @@
 
 {% for event in events %}
 {% if event.public == True %}
-<div class="col-xs-6 col-lg-4">
-  <h2><a href="{% url 'event' event.id %}">{{ event.title }}</a></h2>
+<div class="row">
+  <div class="col-xs-12 col-lg-4">
+      <div class="panel panel-primary">
+          <div class="panel-heading">
+              {{ event.title }}
+          </div>
+    <div class="panel-body">
   {% if clashes %}
   <div class="alert-warning" role="alert">Clashes with <a href="{% url 'event' clashes.id%}">{{clashes.title}}</a></div>
   {% endif %}
@@ -167,8 +172,12 @@
     <label for="title">Leaving at:</label>
 				<input type="text" id="new_end_time" name="new_end_time" placeholder="2016-11-25T12:00:00">
     <input type="hidden" name="schedule" value="1" />
-    <input type="submit" value="Add to Schedule" /> {% endif %}
+    <input type="submit" value="Add to Schedule" /> 
+    {% endif %}
   </form>
+    </div>
+  </div>
 </div>
 {% endif %}
-{% endfor %} {%endblock %}
+{% endfor %} 
+{% endblock %}
