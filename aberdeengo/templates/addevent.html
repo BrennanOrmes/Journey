@@ -1,5 +1,16 @@
 {% extends "layout.html" %}
 {% block head_content %}
+
+<!--
+    addevent.html - Contains functions for creating events, displaying location etc.
+    Author: Team Alpha                                                                          
+    
+    Tested?: Yes
+    Functional?: Yes
+    Merged?: Yes
+    Copyright: (c) 2016 Team Alpha, University of Aberdeen.
+-->
+
     <script type="text/javascript" src="//cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
     <script type="text/javascript" src="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.js"></script>
     <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.css" />
@@ -61,15 +72,17 @@
         
         function initMap() {
           var map = new google.maps.Map(document.getElementById('map'), {
-            center: {lat: -34.397, lng: 150.644},
-            zoom: 13
+            center: {lat: -34.397, lng: 150.644}, // Defualt position for marker.
+            zoom: 13 // Zoom level for map
           });
           
+          // When the user clicks on the map, a marker will be added.
           google.maps.event.addListener(map, 'click', function(event) {
             placeMarker(map, event.latLng);
             document.forms['formA'].elements['location'].value = event.latLng;
           });
           
+          // Create infowindow
           var infoWindow = new google.maps.InfoWindow({map: map});
   
           // Try HTML5 geolocation.
@@ -79,11 +92,13 @@
                 lat: position.coords.latitude,
                 lng: position.coords.longitude
               };
-  
+              // Set infowindow on the user's position.
               infoWindow.setPosition(pos);
               infoWindow.setContent('You are here.');
+              // Set map center on user's location.
               map.setCenter(pos);
             }, function() {
+              // If the map cannot find user's location, call this function.
               handleLocationError(true, infoWindow, map.getCenter());
             });
           } else {
@@ -91,7 +106,7 @@
             handleLocationError(false, infoWindow, map.getCenter());
           }
         }
-  
+        // If location cannot be found, this function will be called.
         function handleLocationError(browserHasGeolocation, infoWindow, pos) {
           infoWindow.setPosition(pos);
           infoWindow.setContent(browserHasGeolocation ?
@@ -99,19 +114,23 @@
                                 'Error: Your browser doesn\'t support geolocation.');
         }
         
+        // Function for placing markers.
         function placeMarker(map, location) {
-            var marker = new google.maps.Marker({
+           var marker = new google.maps.Marker({
               position: location,
               map: map
             });
            
+            // When the user clicks on the map again, we remove the previous markers.
             clearOverlays();
+            // Then add a new marker
             markersArray.push(marker);
             
+            // For testing purposes. Just to see what the coordinates are and compare them to the ones stored in the database.
             var infowindow = new google.maps.InfoWindow({
               content: 'Latitude: ' + location.lat() + '<br>Longitude: ' + location.lng()
             });
-            infowindow.open(map,marker);
+            //infowindow.open(map,marker);
           }
           
         function clearOverlays() {
@@ -122,8 +141,8 @@
           markersArray = [];
         }
         </script>
-		<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyClKcWsgdYmlnLItSUiD5YaJgbrD9ahed4&callback=initMap">
-    </script>
+        <!--Google maps api key-->
+		    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyClKcWsgdYmlnLItSUiD5YaJgbrD9ahed4&callback=initMap"></script>
 				<br>
 				<label for="title">Event Description</label>
 				<input type="text" id="description" name="description" placeholder="What your event is about">

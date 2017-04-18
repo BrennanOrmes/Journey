@@ -46,9 +46,13 @@
 {% block content %}
 
 <div class="row"> 
-    <div class="col-xs-6 col-lg-4">
-        <h2><a href="{% url 'event' event.id %}">{{ event.title }}</a></h2>
-        {% if clashes %}
+    <div class="col-xs-12 col-lg-4">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                {{ event.title }}
+            </div>
+            <div class="panel-body">
+                {% if clashes %}
             <div class="alert-warning" role="alert">Clashes with <a href="{% url 'event' clashes.id%}">{{clashes.title}}</a></div>
         {% endif %}
         {% if inconsistentTime %}
@@ -121,19 +125,21 @@
                      {% csrf_token %}
                        <input type="submit" value="Manage tickets" />
                 </form>
-            {% endif%}
+            {% endif %}
             {% if tickets > 0 %}
                 <form action="{% url 'pay' event.id %}" method="post">
                     {% csrf_token %}
                      <input type="hidden" name="pay" value="ticket" />
                        <input type="submit" value="buy tickets" /> : {{tickets}} left at £{{event.price}} each
                      </form>
-            {% endif %}
-            
+            {% endif%}
+            </div>
+        </div>
+        
     </div>
     
-    <div class="col-xs-6">
-    <div id="map" style="width:100%;height:250px;"></div>
+    <div class="col-xs-12 col-md-8">
+    <div id="map" style="width:100%; height:355px;"></div>
         <script>
             function initMap() {
                 var map = new google.maps.Map(document.getElementById('map'), {
@@ -189,11 +195,8 @@
         </script>
         
     </div>
-    
-    
-    
-    <script src="https://maps.googleapis.com/maps/api/js?callback=myMap"></script>
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key={{API_Key}}&callback=initMap"> </script>
+    <!--Google API Key-->
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyClKcWsgdYmlnLItSUiD5YaJgbrD9ahed4&callback=initMap"> </script>
 
 </div>
 {% if length > 0 %}
@@ -207,4 +210,4 @@
 {% endfor %}
 {% endif %}
 
-{%endblock %}
+{% endblock %}

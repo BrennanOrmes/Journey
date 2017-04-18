@@ -1,6 +1,6 @@
 .jumbotron{
 	visibility: none;
-	/*background-color:  #89B7B5;*/
+	/*background-color:  #337ab7;*/
 }
 
 #navbar{
@@ -9,13 +9,13 @@
 
 #content{
     width: 100%;
-    /*background-color:  #89B7B5;*/
+    /*background-color:  #337ab7;*/
     min-height: 800px;
 }
 
 
 .main{
-	/*background-color: #89B7B5;*/
+	/*background-color: #337ab7;*/
 	
 }
 
