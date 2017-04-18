@@ -15,15 +15,15 @@
         <div class="row" id="signupContent">
             <div id="signForm">
                 <form method="post" action=".">{% csrf_token %}
-                    <p> pick a username</p>
+                    <p> Pick a username</p>
                     {{ form.username}} <br>
                     <p>{{ form.username.errors.as_text }}</p>
-                    <p> enter your email</p>
+                    <p> Enter your email</p>
                     {{ form.email}}<br>
                     <p>{{ form.email.errors.as_text }}</p>
-                     <p> pick a password</p>
+                     <p> Enter your password</p>
                     {{ form.password1}}<br>
-                     <p> enter your password again</p>
+                     <p> Enter your password again</p>
                     {{ form.password2}}<br>
                     {% for error in form.non_field_errors %}
                     <p> {{error}}</p>
