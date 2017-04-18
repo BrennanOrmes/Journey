@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from ..models import Event
 
+
 class Customised(object):
     def __init__(self, event):
         self.event = event
@@ -38,7 +39,6 @@ class Customised(object):
         """Checks if this event overlaps with another event"""
         return (between(self.start_time, other.start_time, self.end_time)
                 or between(other.start_time, self.start_time, other.end_time))
-
 
     def between(x, y, z):
         "Returns true if x <= y <= z"
