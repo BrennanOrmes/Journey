@@ -6,7 +6,8 @@ from django.utils.dateparse import parse_datetime
 from datetime import datetime
 import pytz
 import re
-#from .models import Events
+# from .models import Events
+
 
 def date(s):
     return parse_datetime(s)
