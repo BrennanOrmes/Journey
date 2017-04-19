@@ -1,13 +1,16 @@
 {% extends "layout.html" %} {% block content %}
-{% comment %}
-<div id="map" style="width:100%;height:500px;"></div>
 
-        <script>
-          function initMap() {
+<div id="map" style="width:100%;height:500px;"></div>
+    <script>
+    // Create marker Array
+    markerArray = []
+      // Create google map to be displayed on page.
+      function initMap() {
         var map = new google.maps.Map(document.getElementById('map'), {
           center: {lat: -34.397, lng: 150.644},
           zoom: 13
         });
+        // Window to pop up on marker
         var infoWindow = new google.maps.InfoWindow({map: map});
 
         // Try HTML5 geolocation.
@@ -28,9 +31,21 @@
           // Browser doesn't support Geolocation
           handleLocationError(false, infoWindow, map.getCenter());
         }
-        {% for event in events %}
+        
+        // Add a marker for each event that is in the database and is public
+        {% for result in page.object_list %}
+        {% with result.object as event %}
+        {% if event.public == True %}
         placeMarker(map, "{{event.title}}", "{{event.location}}", "{% url 'event' event.id %}");
+        {% endif %}
+        {% endwith %}
         {% endfor %}
+        
+        
+        // Add a marker clusterer to manage the markers.
+              var markerCluster = new MarkerClusterer(map, markers,
+              {imagePath: 'images/'});
+
       }
 
       function handleLocationError(browserHasGeolocation, infoWindow, pos) {
@@ -39,19 +54,29 @@
                               'Error: The Geolocation service failed.' :
                               'Error: Your browser doesn\'t support geolocation.');
       }
-      
+    // Function for placing markers.
     function placeMarker(map, title, location , url) {
+            // This takes the location string from the databse and converts it into a readable format for google maps to take in.
+            var input = location.substring(1, location.length-1);
+            var latlngStr = input.split(",",2);
+            var lat = parseFloat(latlngStr[0]);
+            var lng = parseFloat(latlngStr[1]);
+            location = new google.maps.LatLng(lat, lng);
             var marker = new google.maps.Marker({
               position: location,
               map: map
             });
-            
             var infowindow = new google.maps.InfoWindow({
               content: "<a href=\"" + url +"\">" + title + "</a>"
             });
+            marker.addListener('click', function() {
+            infowindow.open(map,marker)
+            markerArray.push(location);
+            })
     }
     </script>
-{% endcomment %}
+     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyClKcWsgdYmlnLItSUiD5YaJgbrD9ahed4&callback=initMap"></script>
+
 <h2>Search for an event.</h2>
 
 <form method="get" action=".">
@@ -65,36 +90,39 @@
         </tr>
     </table>
     
-    {% if query %}
-      <h3>Results</h3>
-      {% for result in page.object_list %}
-        {# Note: You need result.object to get the Event object, result is an EventIndex object #}
-        {% with result.object as event %}
-        <div class="col-xs-6 col-lg-4">
-          <h2><a href="{% url 'event' event.id %}">{{ event.title }}</a></h2>
-          {% if clashes %}
-          <div class="alert-warning" role="alert">Clashes with <a href="{% url 'event' clashes.id%}">{{clashes.title}}</a></div>
-          {% endif %}
-          <p>From: {{ event.start_time|date:"D d M Y P" }}</p>
-          <p>To: {{ event.end_time|date:"D d M Y P" }}</p>
-          <p>Description: {{ event.description }}</p>
-          <p>Tags:</p>
-          {% for tag in event.eventTags.all %}
-          <p>{{tag.name}}</p>
-          {% endfor %}
-          <form action="{% url 'scheduleevent' %}" method="post">
-            {% csrf_token %}
-            <input type="hidden" name="event_id" value="{{ event.id }}" /> {% if event in scheduled_events %}
-            <input type="hidden" name="schedule" value="0" />
-            <input type="submit" value="Remove from Schedule" /> {% elif not clashes %}
-            <input type="hidden" name="schedule" value="1" />
-            <input type="submit" value="Add to Schedule" /> {% endif %}
-          </form>
-        </div>
+   {% if query %}
+    <h3>Results</h3>
+      <div class="grid" data-isotope='{ "itemSelector": ".grid-item", "layoutMode": "masonry" }'>
+        {% for result in page.object_list %}
+        <!--{# Note: You need result.object to get the Event object, result is an EventIndex object #}-->
+          {% with result.object as event %}
+          {% if event.public == True %}
+          <div class="grid-item">
+            <div class="panel panel-default">
+              <div class="panel-heading clickable" onclick="location.href='{% url 'event' event.id %}'">
+                {{ event.title }}
+              </div>
+            <div class="panel-body">
+              <p>From: {{ event.start_time|date:"D d M Y P" }}</p>
+              <p>To: {{ event.end_time|date:"D d M Y P" }}</p>
+              <p>Description: {{ event.description }}</p>
+              <p>Tags:</p>
+              {% for tag in event.eventTags.all %}
+              <p>{{tag.name}}</p>
+              {% endfor %}
+               </div>
+            </div>
+          </div>
+         {% endif %}
         {% endwith %}
+         
       {% empty %}
         <p>No results found.</p>
-      {% endfor %}
+      
+    
+  {% endfor %}
+  
+</div>
       
       {# The following links to the previous or next pages if there is more than one page of results #}
       {% if page.has_previous or page.has_next %}
@@ -109,13 +137,26 @@
   {% else %}
     {# Show some example queries to run, maybe query syntax, something else? #}
   {% endif %}
+  
 </form>
 
-  <!-- TODO: Brennan: should this be in each result or just at the end? -->
-  <script src="https://maps.googleapis.com/maps/api/js?callback=myMap"></script>
-  <script async defer src="https://maps.googleapis.com/maps/api/js?key={{API_Key}}&callback=initMap">
-  </script>
 
-</div>
+<script type="text/javascript">
+  /* global $ */
+  /* global event */
+  
+  event.ready(function (event) {
+    event.evens.bind('loaded', function (event) {
+      $('.grid').isotope({
+        itemSelector: '.grid-item',
+        masonry: {
+          fitWidth: true
+        }
+      });
+    });
+  });
+  
+</script>
+<!--THIS IS BEING USED-->
 
 {%endblock %}

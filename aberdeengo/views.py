@@ -96,7 +96,9 @@ def searchEvents(request):
     events = Event.search(search_string, user_tags)  # TODO: add limiting
     events.sort(key=lambda x: x.start_time)
     template = loader.get_template('search.html')
-    context = {'events': events}
+    context = RequestContext(request,{
+        'events': events
+    })
     return HttpResponse(template.render(context, request))
 
 
@@ -200,10 +202,11 @@ def addEvent(request):
                     e.eventTags.add(tag)
                 start_time = start_time + timedelta(days=recurrence)
                 end_time = end_time + timedelta(days=recurrence)
-        # e = Event(title=title, start_time=start_time, end_time=end_time, location=location, description=description, price=cost, user=user, recurrence=recurrence)
-        # e.save()
-        # for tag in tags:
-            #  e.eventTags.add(tag)
+        else:
+            e = Event(title=title, start_time=start_time, end_time=end_time, location=location, description=description, price=cost, user=user)
+            e.save()
+            for tag in tags:
+                e.eventTags.add(tag)
         if public == "True":
             return redirect("pay", e.id)
         else:

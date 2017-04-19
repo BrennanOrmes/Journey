@@ -174,21 +174,6 @@
           <input type="hidden" name="timeschanged" value="1">' : '<input type="hidden" name="timeschanged" value="0">';
         }
         
-        
-        
-        // function Reminder(duration, index)
-        // {
-        //   Push.create("Reminder", {
-        //     body: "You have an event coming up at",
-        //     icon: 'icon.png',
-        //     timeout: 4000,
-        //     onClick: function() {
-        //       window.focus();
-        //       this.close();
-        //     }
-        //   }
-        // }
-            
     </script>
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyClKcWsgdYmlnLItSUiD5YaJgbrD9ahed4&callback=initMap">
     </script>
@@ -217,9 +202,10 @@
           <input type="radio" name="travel" value="DRIVING" {%if part_taking.travelType == "DRIVING" %}checked {%endif%}> Drive<br>
           <input type="radio" name="travel" value="TRANSIT" {%if part_taking.travelType == "TRANSIT" %}checked {%endif%}> Transit
           <input type="hidden" name="entry_id" value="{{part_taking.id}}">
+          <br>
           <input type="submit" name="submit" value="Update" />
         </form>
-          <div id = "display{{forloop.counter0}}">Travel feasibility should be displayed here</div>
+          <div id = "display{{forloop.counter0}}"></div>
           <form action="{% url 'scheduleevent' %}" method="post">
           {% csrf_token %}
           <input type="hidden" name="entry_id" value="{{ part_taking.id }}" />

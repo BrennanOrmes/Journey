@@ -87,7 +87,9 @@
         }
         // Add a marker for each event
         {% for event in events %}
+        {% if event.public == True %}
         placeMarker(map, "{{event.title}}", "{{event.location}}", "{% url 'event' event.id %}");
+        {% endif %}
         {% endfor %}
         
         
@@ -124,18 +126,18 @@
             })
     }
     </script>
-     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyClKcWsgdYmlnLItSUiD5YaJgbrD9ahed4&callback=initMap">
-    </script>
+     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyClKcWsgdYmlnLItSUiD5YaJgbrD9ahed4&callback=initMap"></script>
 <h2>Search for an event.</h2>
 <form action="{% url 'search'%}" method="get">
   <input type="text" name="q">
   <input type="submit" value="submit">
 </form>
 
+
+<div class="grid" data-isotope='{ "itemSelector": ".grid-item", "layoutMode": "masonry" }'>
 {% for event in events %}
 {% if event.public == True %}
-<div class="row">
-  <div class="col-xs-12 col-lg-4">
+<div class="grid-item">
       <div class="panel panel-primary">
           <div class="panel-heading">
               {{ event.title }}
@@ -178,6 +180,24 @@
     </div>
   </div>
 </div>
+
+<script type="text/javascript">
+  /* global $ */
+  /* global event */
+  
+  event.ready(function (event) {
+    event.evens.bind('loaded', function (event) {
+      $('.grid').isotope({
+        itemSelector: '.grid-item',
+        masonry: {
+          fitWidth: true
+        }
+      });
+    });
+  });
+</script>
+
+<!--DO NOT USE THIS-->
 {% endif %}
 {% endfor %} 
 {% endblock %}

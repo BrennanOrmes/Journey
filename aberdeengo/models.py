@@ -13,11 +13,6 @@ class Tag(models.Model):
         return self.event_set.count()
 
 
-class Tag(models.Model):
-    name = models.CharField(max_length=255)
-    description = models.CharField(max_length=255)
-
-
 class CustomUserManager(UserManager):
     def _create_user(self, username, email, password, **extra_fields):
         if 'schedule' not in extra_fields:
