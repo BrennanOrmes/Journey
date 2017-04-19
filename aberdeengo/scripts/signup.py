@@ -1,12 +1,9 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
-<<<<<<< HEAD
 from django.template.defaultfilters import filesizeformat
 from django.conf import settings 
-=======
 
->>>>>>> 3ee0d030d7e03367a1c803435e038fe6480c13b4
 
 class RegistrationForm(forms.Form):
     username = forms.RegexField(regex=r'^\w+$', widget=forms.TextInput(attrs=dict(required=True, max_length=30)), label=_("username"), error_messages={'invalid': _("This value must contain only letters, numbers and underscores.")})

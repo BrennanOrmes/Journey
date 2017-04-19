@@ -310,18 +310,12 @@ def accounts(request, username=None):
     if request.method == 'POST':
         form = DocumentForm(request.POST, request.FILES)
         if form.is_valid():
-<<<<<<< HEAD
             if form.cleaned_data['docfile']:
                 currentUser.profilePicture = form.cleaned_data['docfile']
                 currentUser.save()
             else:
                 messages.error(request, "Error")
         return HttpResponseRedirect('/accounts/'+ currentUsername)
-=======
-            currentUser.profilePicture = request.FILES['docfile']
-            currentUser.save()
-        return HttpResponseRedirect('/accounts/' + currentUsername)
->>>>>>> 3ee0d030d7e03367a1c803435e038fe6480c13b4
     else:
         events = Event.objects.filter(user=currentUser).order_by('publication_date')
         form = DocumentForm()
