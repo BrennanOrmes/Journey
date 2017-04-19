@@ -60,7 +60,7 @@
         <form id="formA" action="{% url 'addevent'%}" method="post">
             {% csrf_token %}
             <label for="title">Event Name</label>
-				<input type="text" id="title" name="title" placeholder="Your Event">
+				<input type="text" id="title" name="title" placeholder="Your Event"  class="form-control">
 				<br>
 				<label for="title">Event Location - <i>Click where your event will be held</i></label>
 				<input type="hidden" id="location" name="location" placeholder="Your Location">
@@ -144,11 +144,11 @@
         <!--Google maps api key-->
 		    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyClKcWsgdYmlnLItSUiD5YaJgbrD9ahed4&callback=initMap"></script>
 				<br>
-				<label for="title">Event Description</label>
-				<input type="text" id="description" name="description" placeholder="What your event is about">
+				<label for="title">Event Description</label><br>
+				<textarea type="text" id="description" name="description" placeholder="What your event is about" class="form-control"></textarea>
 				<br>
-			  <label for="daterange">Event Dates</label>
-        <input type="text" name="daterange" id="daterange" /><br>
+			  <label for="daterange">Event Dates</label><br>
+        <input type="text" name="daterange" id="daterange" class="form-control"/><br>
         <input type="hidden" id="startdate" name="startdate"/>
         <input type="hidden" id="enddate" name="enddate"/>
 				<br>
