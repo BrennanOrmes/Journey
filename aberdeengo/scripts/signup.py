@@ -1,6 +1,8 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
+from django.template.defaultfilters import filesizeformat
+from django.conf import settings 
 
 
 class RegistrationForm(forms.Form):
@@ -24,10 +26,16 @@ class RegistrationForm(forms.Form):
 
 
 class DocumentForm(forms.Form):
-    docfile = forms.FileField(
-        label='upload profile picture',
-    )
-
+    docfile = forms.FileField(label='upload profile picture')
+    def clean_docfile(self):
+        image = self.cleaned_data['docfile']
+        if image:
+            if image._size > 1024*1024:
+                raise forms.ValidationError("Image file too large ( > 1mb )")
+            return image
+        else:
+            raise forms.ValidationError("Couldn't read uploaded image")
+    
 
 class PasswordForm(forms.Form):
     password = forms.CharField(widget=forms.PasswordInput, required=False)
