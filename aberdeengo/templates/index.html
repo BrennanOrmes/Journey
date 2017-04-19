@@ -1,6 +1,14 @@
 {% extends "layout.html" %}
 {% block content %}
-
+{% load static %}
+<style>
+ body {
+ background-image: url("{% static "logo.jpg" %}");
+ background-repeat: no-repeat;
+ background-attachment: fixed;
+ background-position: right; 
+ }
+</style>
 	{% if user.is_authenticated %}
 		<p>{{user.username}}</p>
 		<p>Based on your interests we thought you might also like:</p>

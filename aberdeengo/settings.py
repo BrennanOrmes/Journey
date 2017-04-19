@@ -23,9 +23,9 @@ PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'hu&)bdmx#l4^kzuat-g%juyqqd!$7+uy8vu5%c1_y#ug(s*d&('
 
-#Google API Key DO NOT DELETE!
+# Google API Key DO NOT DELETE!
 
-API_Key = 'AIzaSyClKcWsgdYmlnLItSUiD5YaJgbrD9ahed4'
+API_KEY = 'AIzaSyClKcWsgdYmlnLItSUiD5YaJgbrD9ahed4'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -133,10 +133,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(PROJECT_ROOT,'staticfiles')
+STATIC_ROOT = os.path.join(PROJECT_ROOT, 'staticfiles')
 STATICFILES_DIRS = (
     os.path.join(PROJECT_ROOT, 'static'),
-    )
+)
 
 STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
 
@@ -159,7 +159,7 @@ AUTHENTICATION_BACKENDS = (
 
 LOGIN_URL = 'signup'
 
-SOCIAL_AUTH_USER_MODEL='aberdeengo.CustomUser'
+SOCIAL_AUTH_USER_MODEL = 'aberdeengo.CustomUser'
 
 # These should not be included in the repo, but I will be deactivating
 # them once the project is over -- ian

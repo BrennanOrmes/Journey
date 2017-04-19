@@ -28,9 +28,9 @@
 	{% csrf_token %}
 
 	
-		<p> enter your username</p>
+		<p> Enter your username</p>
             {{ form.username}} <br>
-			<p> enter your password</p>
+			<p> Enter your password</p>
 		{{ form.password }}<br>
 	
 
@@ -43,6 +43,7 @@
         <a href="{% url 'social:begin' 'twitter' %}">Login with Twitter</a><br>
         <a href="{% url 'social:begin' 'facebook' %}">Login with Facebook</a><br>
 </form>
+<br>
 <p><a href="{% url 'password_reset' %}">Lost password?</a></p>
 </div>
 

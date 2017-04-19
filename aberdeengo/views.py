@@ -32,6 +32,7 @@ from scripts.signup import *
 
 # Create your views here. --> WHOOP
 
+
 @csrf_exempt
 def home(request):
     if request.user.is_anonymous():
@@ -45,7 +46,7 @@ def home(request):
             'recurrent': recurrent,
             'recurrences': recurrences
         })
-        return HttpResponse(template.render(context,request))
+        return HttpResponse(template.render(context, request))
     else:
         currentUsername = request.user.username
         currentUser = CustomUser.objects.get(username=currentUsername)
@@ -56,25 +57,25 @@ def home(request):
             v.save()
         recommend_by_interest(currentUser)
         recommend_by_other_users(currentUser)
-        votes = Vote.objects.filter(user = currentUser)
+        votes = Vote.objects.filter(user=currentUser)
         events_by_interest = []
         events_by_other_users = []
         votes = votes.order_by('interestScore').reverse()
         voteInterest = votes.order_by('interestScore').reverse()
-        
+
         for vote in votes:
             for event in Event.objects.all():
                 if vote.event == event and vote.interestScore is not 0:
                     events_by_interest.append(event)
-        
+
         votes = votes.order_by('othersScore').reverse()
         voteOthers = votes.order_by('interestScore').reverse()
-        
+
         for vote in votes:
             for event in Event.objects.all():
                 if vote.event == event and vote.othersScore is not 0 and vote.interestScore == 0:
                     events_by_other_users.append(event)
-        
+
         template = loader.get_template('index.html')
         context = RequestContext(request, {
             'events_by_interest': events_by_interest,
@@ -83,59 +84,62 @@ def home(request):
             'voteInterest': voteInterest,
             'voteOthers': voteOthers
         })
-        return HttpResponse(template.render(context,request))
-    
+        return HttpResponse(template.render(context, request))
+
+
 def contact(request):
-    return render(request,'contact.html')
-    
+    return render(request, 'contact.html')
+
+
 def searchEvents(request):
-    search_string = request.GET.get("q",'')
-    events = Event.search(search_string, user_tags) #TODO: add limiting
+    search_string = request.GET.get("q", '')
+    events = Event.search(search_string, user_tags)  # TODO: add limiting
     events.sort(key=lambda x: x.start_time)
     template = loader.get_template('search.html')
-    context = {  'events': events }
-    return HttpResponse(template.render(context,request))
+    context = RequestContext(request,{
+        'events': events
+    })
+    return HttpResponse(template.render(context, request))
+
 
 @login_required
 def schedule(request):
     template = loader.get_template('schedule.html')
     user = CustomUser.objects.get(username=request.user.username)
-    events_no = range(1, len(user.schedule.scheduled_events())+1)
+    events_no = range(1, len(user.schedule.scheduled_events()) + 1)
     context = {
-        'schedule' : user.schedule,
-        'indexes' : events_no
+        'schedule': user.schedule,
+        'indexes': events_no,
     }
     if request.method == "POST":
-        travelType = request.POST.get('travel','')
-        entry_id = request.POST.get('entry_id','')
+        travelType = request.POST.get('travel', '')
+        entry_id = request.POST.get('entry_id', '')
         update_entry = ScheduleEntry.find_by_id(entry_id)
-        if request.POST.get('timeschanged','') == "1":
-            if request.POST.get('new_start_time','') != '':
-                update_entry.start = date(request.POST.get('new_start_time',''))
-            if request.POST.get('new_end_time','') != '':
-                update_entry.end = date(request.POST.get('new_end_time',''))
+        if request.POST.get('timeschanged', '') == "1":
+            if request.POST.get('new_start_time', '') != '':
+                update_entry.start = date(request.POST.get('new_start_time', ''))
+            if request.POST.get('new_end_time', '') != '':
+                update_entry.end = date(request.POST.get('new_end_time', ''))
         update_entry.travelType = travelType
         update_entry.save()
-    return HttpResponse(template.render(context,request))
-    
+    return HttpResponse(template.render(context, request))
 
 
-def event(request,id):
+def event(request, id):
     event = Event.find_by_id(int(id))
     tags = event.eventTags.all()
     clashes = request.GET.get('clash')
     if clashes:
         clashes = ScheduleEntry.find_by_id(int(clashes)).event
     inconsistentTime = request.GET.get('inconsistentTime')
-    
-    
+
     template = loader.get_template('event.html')
     # Will need to split out the veent part of the search template so that we don't get "clashes" appearing everywhere
     if request.user.is_anonymous():
         scheduled_events = []
         username = ""
     else:
-        username = request.user.username;
+        username = request.user.username
         user = CustomUser.objects.get(username=username)
         scheduled_events = user.schedule.scheduled_events()
     if event.recurrence > 0:
@@ -150,48 +154,59 @@ def event(request,id):
     length = len(sameGroup)
     context = {
         'event': event,
-        'clashes' : clashes,
+        'clashes': clashes,
         'tags': tags,
         'inconsistentTime': inconsistentTime,
-        'scheduled_events' : scheduled_events,
-        'username' : username,
-        'tickets' : event.max_tickets - event.sold_tickets,
+        'scheduled_events': scheduled_events,
+        'username': username,
+        'tickets': event.max_tickets - event.sold_tickets,
         'sameGroup': sameGroup,
         'length': length
     }
-    return HttpResponse(template.render(context,request))
-    
-    
+    return HttpResponse(template.render(context, request))
+
+
 @login_required
 def addEvent(request):
     if request.method == "POST":
         # TODO: check fields
-        title = request.POST.get('title','')
-        location = request.POST.get('location','')
-        description = request.POST.get('description','')
-        start_time = date(request.POST.get('startdate',''))
-        end_time = date(request.POST.get('enddate',''))
+        title = request.POST.get('title', '')
+        location = request.POST.get('location', '')
+        description = request.POST.get('description', '')
+        start_time = date(request.POST.get('startdate', ''))
+        end_time = date(request.POST.get('enddate', ''))
         currentUsername = request.user.username
         user = CustomUser.objects.get(username=currentUsername)
-        tags = request.POST.getlist('tags[]',[])
-        public = request.POST.get('public','')
+        tags = request.POST.getlist('tags[]', [])
+        public = request.POST.get('public', '')
         recurrence = int(request.POST.get('recurrence', ''))
-        times = int(request.POST.get('times',''))
+        times = int(request.POST.get('times', ''))
         cost = 0
         if recurrence > 0:
             g = GroupOfEvents(title=title)
             g.save()
-            for n in range(0,times):
-                e = Event(title=title, start_time=start_time, end_time=end_time, location=location, description=description, price=cost, user=user, recurrence=recurrence, group=g)
+            for n in range(0, times):
+                e = Event(
+                        title=title,
+                        start_time=start_time,
+                        end_time=end_time,
+                        location=location,
+                        description=description,
+                        price=cost,
+                        user=user,
+                        recurrence=recurrence,
+                        group=g
+                )
                 e.save()
                 for tag in tags:
                     e.eventTags.add(tag)
-                start_time = start_time + timedelta(days = recurrence)
-                end_time = end_time + timedelta(days = recurrence)
-        # e = Event(title=title, start_time=start_time, end_time=end_time, location=location, description=description, price=cost, user=user, recurrence=recurrence)
-        # e.save()
-        # for tag in tags:
-            #  e.eventTags.add(tag)
+                start_time = start_time + timedelta(days=recurrence)
+                end_time = end_time + timedelta(days=recurrence)
+        else:
+            e = Event(title=title, start_time=start_time, end_time=end_time, location=location, description=description, price=cost, user=user)
+            e.save()
+            for tag in tags:
+                e.eventTags.add(tag)
         if public == "True":
             return redirect("pay", e.id)
         else:
@@ -199,10 +214,10 @@ def addEvent(request):
     else:
         tags = Tag.objects.all()
         template = loader.get_template('addevent.html')
-        context = RequestContext(request,{
+        context = RequestContext(request, {
             'tags': tags
         })
-        return HttpResponse(template.render(context,request))
+        return HttpResponse(template.render(context, request))
 
 
 @login_required
@@ -213,23 +228,28 @@ def schedule_event(request):
             try:
                 event_id = int(request.POST.get('event_id'))
                 event = Event.find_by_id(event_id)
-                start_input = request.POST.get('new_start_time','')
+                start_input = request.POST.get('new_start_time', '')
                 if start_input == '':
                     new_start_time = event.start_time
                 else:
                     new_start_time = date(start_input)
-                end_input = request.POST.get('new_end_time','')
+                end_input = request.POST.get('new_end_time', '')
                 if end_input == '':
                     new_end_time = event.end_time
                 else:
                     new_end_time = date(end_input)
                 currentUsername = request.user.username
                 user = CustomUser.objects.get(username=currentUsername)
-                newentry = ScheduleEntry(event = event, schedule = user.schedule, start = new_start_time, end = new_end_time)
+                newentry = ScheduleEntry(
+                    event=event,
+                    schedule=user.schedule,
+                    start=new_start_time,
+                    end=new_end_time,
+                )
                 user.schedule.add_event(newentry)
                 return redirect('schedule')
             except EventsClash as e:
-                return redirect(reverse('event', args=[event_id]) + '?clash={}'.format(e.e2.id)) # hack
+                return redirect(reverse('event', args=[event_id]) + '?clash={}'.format(e.e2.id))  # hack
             except InconsistentTime as e:
                 return redirect(reverse('event', args=[event_id]) + '?inconsistentTime={}'.format(e.e2))
         else:
@@ -239,19 +259,23 @@ def schedule_event(request):
             return redirect('schedule')
     else:
         raise Http404("Page not found")
-        
+
+
 def signup(request):
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
-      
+
         if form.is_valid():
             user = CustomUser.objects.create_user(
-            username=form.cleaned_data['username'],
-            password=form.cleaned_data['password1'],
-            email=form.cleaned_data['email'],
-            payment = 'none',
+                username=form.cleaned_data['username'],
+                password=form.cleaned_data['password1'],
+                email=form.cleaned_data['email'],
+                payment='none',
             )
-            user = authenticate(username=form.cleaned_data['username'], password=form.cleaned_data['password1'])
+            user = authenticate(
+                username=form.cleaned_data['username'],
+                password=form.cleaned_data['password1']
+            )
             login(request, user)
             return redirect('home')
         else:
@@ -260,53 +284,61 @@ def signup(request):
         template = loader.get_template('signup.html')
         form = RegistrationForm()
     variables = RequestContext(request, {
-    'form': form
+        'form': form
     })
- 
+
     return render_to_response(
-    'signup.html',
-    variables,
+        'signup.html',
+        variables,
     )
+
 
 def logout(request):
     if request.method == 'POST':
         auth.logout(request)
-        return render(request,'index.html')
-    
+        return render(request, 'index.html')
     elif request.user.is_authenticated():
-        return render(request,'logout.html')
+        return render(request, 'logout.html')
     else:
         return redirect(login)
 
-@login_required() 
+
+@login_required()
 def accounts(request, username=None):
     currentUsername = request.user.username
     currentUser = CustomUser.objects.get(username=currentUsername)
     if request.method == 'POST':
         form = DocumentForm(request.POST, request.FILES)
         if form.is_valid():
+<<<<<<< HEAD
             if form.cleaned_data['docfile']:
                 currentUser.profilePicture = form.cleaned_data['docfile']
                 currentUser.save()
             else:
                 messages.error(request, "Error")
         return HttpResponseRedirect('/accounts/'+ currentUsername)
+=======
+            currentUser.profilePicture = request.FILES['docfile']
+            currentUser.save()
+        return HttpResponseRedirect('/accounts/' + currentUsername)
+>>>>>>> 3ee0d030d7e03367a1c803435e038fe6480c13b4
     else:
-        events = Event.objects.filter(user=currentUser).order_by('publication_date') 
-        form = DocumentForm() 
+        events = Event.objects.filter(user=currentUser).order_by('publication_date')
+        form = DocumentForm()
         context = {
-        'user': currentUser,
-        'events': events,
-        'form': form
+            'user': currentUser,
+            'events': events,
+            'form': form
         }
         context.update(get_social_context(currentUser))
         return render_to_response(
-        'accounts.html',
-        context,
-        context_instance=RequestContext(request)
-    )
-    
-@login_required()     
+            'accounts.html',
+            context,
+            context_instance=RequestContext(request)
+        )
+
+
+@login_required()
 def editAccount(request):
     currentUsername = request.user.username
     currentUser = CustomUser.objects.get(username=currentUsername)
@@ -317,19 +349,21 @@ def editAccount(request):
     }
     template = loader.get_template('ajax/profile.html')
     return HttpResponse(template.render(context, request))
-    
-@login_required() 
-def ownedEvents(request): 
+
+
+@login_required()
+def ownedEvents(request):
     currentUsername = request.user.username
     currentUser = CustomUser.objects.get(username=currentUsername)
-    events = Event.objects.filter(user=currentUser).order_by('publication_date') 
+    events = Event.objects.filter(user=currentUser).order_by('publication_date')
     context = {
         'events': events
     }
     template = loader.get_template('ajax/events.html')
     return HttpResponse(template.render(context, request))
 
-@login_required()     
+
+@login_required()
 def interests(request):
     if request.method == 'POST':
         currentUsername = request.user.username
@@ -337,7 +371,7 @@ def interests(request):
         # for interest in currentUser.userInterests.all():
         #     currentUser.userInterests.remove(interest)
         currentUser.userInterests.clear()
-        tags = request.POST.getlist('tags[]',[])
+        tags = request.POST.getlist('tags[]', [])
         for tag in tags:
             currentUser.userInterests.add(tag)
         template = loader.get_template('accounts.html')
@@ -357,39 +391,42 @@ def interests(request):
         template = loader.get_template('ajax/interests.html')
         return HttpResponse(template.render(context, request))
 
-@login_required()     
+
+@login_required()
 def name(request):
     if request.method == 'POST':
         currentUsername = request.user.username
         currentUser = CustomUser.objects.get(username=currentUsername)
-        firstname = request.POST.get('firstname','')
+        firstname = request.POST.get('firstname', '')
         lastname = request.POST.get('lastname', '')
-        currentUser.first_name = firstname;
-        currentUser.last_name = lastname;
-        currentUser.save();
+        currentUser.first_name = firstname
+        currentUser.last_name = lastname
+        currentUser.save()
         template = loader.get_template('accounts.html')
         context = {
-        'user': currentUser
+            'user': currentUser
         }
         return HttpResponse(template.render(context, request))
     else:
-        return render(request,'ajax/name.html')  
+        return render(request, 'ajax/name.html')
+
 
 @login_required
 def email(request):
     if request.method == 'POST':
         currentUsername = request.user.username
         currentUser = CustomUser.objects.get(username=currentUsername)
-        email = request.POST.get('email','')
-        currentUser.email = email;
-        currentUser.save();
+        email = request.POST.get('email', '')
+        currentUser.email = email
+        currentUser.save()
         template = loader.get_template('accounts.html')
         context = {
-        'user': currentUser
+            'user': currentUser
         }
         return HttpResponse(template.render(context, request))
     else:
-       return render(request,'ajax/email.html')  
+        return render(request, 'ajax/email.html')
+
 
 def change_password(request):
     form = PasswordChangeForm(user=request.user)
@@ -400,7 +437,7 @@ def change_password(request):
             form.save()
             update_session_auth_hash(request, form.user)  # Important!
             messages.success(request, 'Your password was successfully updated!')
-            return HttpResponseRedirect('/accounts/'+ name)
+            return HttpResponseRedirect('/accounts/' + name)
         else:
             messages.error(request, 'Please correct the error below.')
     else:
@@ -408,22 +445,24 @@ def change_password(request):
     return render(request, 'changeP.html', {
         'form': form
     })
-    
+
+
 def addPayment(request):
     if request.method == 'POST':
         currentUsername = request.user.username
         currentUser = CustomUser.objects.get(username=currentUsername)
-        payment = request.POST.get('payment','')
-        currentUser.payment =  payment;
-        currentUser.save();
+        payment = request.POST.get('payment', '')
+        currentUser.payment = payment
+        currentUser.save()
         template = loader.get_template('accounts.html')
         context = {
-        'user': currentUser,
-        'username': currentUser.payment
+            'user': currentUser,
+            'username': currentUser.payment
         }
         return HttpResponse(template.render(context, request))
     else:
-       return render(request,'ajax/addPayment.html')  
+        return render(request, 'ajax/addPayment.html')
+
 
 @login_required
 def pay(request, id):
@@ -436,7 +475,7 @@ def pay(request, id):
         "cancel_return": request.build_absolute_uri(reverse('event', args=[id])),
         "item_number": id,
     }
-    payment = request.POST.get('pay','')
+    payment = request.POST.get('pay', '')
     event = Event.find_by_id(int(id))
     name = str(request.user.username)
     if payment == "range1":
@@ -464,18 +503,18 @@ def pay(request, id):
         paypal_dict["custom"] = "666"
         paypal_dict["amount"] = "0.00"
         paypal_dict["item_name"] = "Something went wrong, please go back"
-    
 
     # Create the instance.
     form = PayPalPaymentsForm(initial=paypal_dict)
-    context = {"form": form, "event": event , "pay" : payment, }
+    context = {"form": form, "event": event, "pay": payment, }
     return render(request, "payment.html", context)
+
 
 def handlePayment(sender, **kwargs):
     ipn_obj = sender
     eventid = int(ipn_obj.item_number)
     e = Event.find_by_id(eventid)
-    
+
     if ipn_obj.custom == "0":
         e.public = True
     elif ipn_obj.custom == "1":
@@ -487,50 +526,53 @@ def handlePayment(sender, **kwargs):
     elif ipn_obj.custom == "666":
         return redirect(event, eventid)
     else:
-        e.sold_tickets +=1
+        e.sold_tickets += 1
         e.save()
         currentUsername = str(ipn_obj.custom)
         currentUser = CustomUser.objects.get(username=currentUsername)
-        string =  currentUsername + "-" +  get_random_string(length=16)
-        t = Ticket(user = currentUser, event = e,code = string)
+        string = currentUsername + "-" + get_random_string(length=16)
+        t = Ticket(user=currentUser, event=e, code=string)
         t.save()
         return redirect(event, int(eventid))
-        
+
     e.save()
     return redirect(event, int(eventid))
-    
+
 
 valid_ipn_received.connect(handlePayment)
+
 
 # @staff_member_required
 def stats(request):
     s = Summary.most_recent(force=True)
     return render(request, 'stats.html', {'summary': s})
-    
-    
-def createticket(request,id):
+
+
+def createticket(request, id):
     currentEvent = Event.find_by_id(id)
     if request.method == 'POST':
-        currentEvent.max_tickets = request.POST.get('number','')
-        currentEvent.price = request.POST.get('price','')
+        currentEvent.max_tickets = request.POST.get('number', '')
+        currentEvent.price = request.POST.get('price', '')
         currentEvent.save()
-        return redirect(event,id)
-    ticket =  Ticket.objects.filter(event = currentEvent)
-    return render(request,'createTickets.html', {'id': id, 'ticket': ticket})  
+        return redirect(event, id)
+    ticket = Ticket.objects.filter(event=currentEvent)
+    return render(request, 'createTickets.html', {'id': id, 'ticket': ticket})
+
 
 def ticketlist(request):
     currentUsername = request.user.username
     currentUser = CustomUser.objects.get(username=currentUsername)
     tickets = Ticket.objects.filter(user=currentUser)
-    context = { 'tickets': tickets }
+    context = {'tickets': tickets}
     template = loader.get_template('ajax/ticketlist.html')
     return HttpResponse(template.render(context, request))
-    
+
+
 def ticket(request, id):
     if request.method == 'POST':
         ticket = Ticket.objects.get(id=id)
-        context = { 'ticket': ticket}
+        context = {'ticket': ticket}
         template = loader.get_template('ticket.html')
-        return HttpResponse(template.render(context, request))  
+        return HttpResponse(template.render(context, request))
     else:
         return redirect(home)

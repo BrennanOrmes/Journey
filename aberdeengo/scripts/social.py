@@ -1,5 +1,6 @@
 from social_django.models import UserSocialAuth
 
+
 def get_social_context(user):
     try:
         github_login = user.social_auth.get(provider='github')
