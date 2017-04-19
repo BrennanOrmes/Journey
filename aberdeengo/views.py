@@ -285,8 +285,11 @@ def accounts(request, username=None):
     if request.method == 'POST':
         form = DocumentForm(request.POST, request.FILES)
         if form.is_valid():
-            currentUser.profilePicture = request.FILES['docfile']
-            currentUser.save()
+            if form.cleaned_data['docfile']:
+                currentUser.profilePicture = form.cleaned_data['docfile']
+                currentUser.save()
+            else:
+                messages.error(request, "Error")
         return HttpResponseRedirect('/accounts/'+ currentUsername)
     else:
         events = Event.objects.filter(user=currentUser).order_by('publication_date') 
@@ -296,7 +299,7 @@ def accounts(request, username=None):
         'events': events,
         'form': form
         }
-        context.update(get_social_context(request.user))
+        context.update(get_social_context(currentUser))
         return render_to_response(
         'accounts.html',
         context,

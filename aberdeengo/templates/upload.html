@@ -15,7 +15,7 @@
                         <p>{{ form.non_field_errors }}</p>
                         <p>{{ form.docfile.label_tag }} </p>
                         <p>
-                                {{ form.docfile.errors }}
+                                {{ form.docfile.errors.as_text }}
                                 {{ form.docfile }}
                         </p>
                         <p><input type="submit" value="Upload" /></p>
