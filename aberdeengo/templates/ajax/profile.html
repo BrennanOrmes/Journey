@@ -10,31 +10,31 @@
         {% for tag in tags %}
         <p>{{tag.name}}</p>
         {% endfor %}
-    
-        <input type="submit" value="Edit" id="interests" data="{% url 'interests' %}"/></p>
+        
+       <br><input type="submit" value="Edit" id="interests" data="{% url 'interests' %}"/></p>
     
     <p> name:  
     
     {% if user.first_name == "" %}
-         <input type="submit" value="Add" id="nameButton" data="{% url 'name' %}"/></p>  
+         <br><input type="submit" value="Add" id="nameButton" data="{% url 'name' %}"/></p>  
     {% else %}
         {{ user.first_name }} {{ user.last_name}} <input type="submit" value="change" id="nameButton" data="{% url 'name' %}"/></p> 
     {% endif %} 
     
-    email: {{ user.email }}  <input id="mailButton" type="submit" value="change" data="{% url 'email' %}" />
+    email: {{ user.email }}  <br><input id="mailButton" type="submit" value="change" data="{% url 'email' %}" />
     
     <br> 
     <br>
         <form action="{% url 'change_password' %}" method="get">
-     change password:<input type="submit" value="change" />
+     change password: <br><input type="submit" value="change" />
     </form>
 
     <br>
     
     {% if user.payment == "" %}
-        add payment: <input id="paymentButton" type="submit" value="add"  data="{% url 'addPayment' %}"/>
+        add payment: <br><input id="paymentButton" type="submit" value="add"  data="{% url 'addPayment' %}"/>
     {% else %}
-       payment method: {{ user.payment }}  <input id="paymentButton" type="submit" value="change"  data="{% url 'addPayment' %}"/>
+       payment method: {{ user.payment }}  <br><input id="paymentButton" type="submit" value="change"  data="{% url 'addPayment' %}"/>
     {% endif %} 
 
 </div>

@@ -1,48 +1,4 @@
 {% extends "layout.html" %}
-{% block head_content %}
-    <script type="text/javascript" src="//cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
-    <script type="text/javascript" src="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.js"></script>
-    <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.css" />
-    <script type="text/javascript">
-      $(document).ready(function() {
-        var options = {
-          timePicker : true,
-          timePickerIncrement : 1,
-          // timePicker24Hour : true,
-          // autoApply : true,
-          locale: {
-            format: 'DD/MM/YYYY h:mm A'
-          }
-        };
-        
-        var pyformat = "YYYY-MM-DDTHH:mm:ssZZ";
-        
-        $('input[name="daterange"]').daterangepicker(options);
-        $('input[name="daterange"]').on('apply.daterangepicker', function (ev, picker) {
-
-          $('#formA input[name="new_start_time"]').val(picker.startDate.format(pyformat));
-          $('#formA input[name="new_end_time"]').val(picker.endDate.format(pyformat));
-        });
-
-        $('#formA').submit(function () {
-          $('input[name="daterange"]', this).prop('disabled', true);
-            return true;
-        });
-
-        var start = moment("{{ event.start_time|date:'c' }}");
-        var end   = moment("{{ event.end_time|date:'c' }}");
-
-        // Set Hidden Values
-        $('#formA input[name="new_start_time"]').val(start.format(pyformat));
-        $('#formA input[name="new_end_time"]').val(end.format(pyformat));
-
-        // Set Date Picker
-        $('#formA input[name="daterange"]').data('daterangepicker').setStartDate(start);
-        $('#formA input[name="daterange"]').data('daterangepicker').setEndDate(end);
-
-      });
-    </script>
-{% endblock %}
 {% block content %}
 
 <div class="row"> 
@@ -182,16 +138,26 @@
                     'Error: Your browser doesn\'t support geolocation.');
             }
         
-            function placeMarker(map, title, location, url) {
-                var marker = new google.maps.Marker({
-                    position: location,
-                    map: map
-                });
-        
-                var infowindow = new google.maps.InfoWindow({
-                    content: "<a href=\"" + url + "\">" + title + "</a>"
-                });
-            }
+             function placeMarker(map, title, location , url) {
+              // This takes the location string from the databse and converts it into a readable format for google maps to take in.
+              var input = location.substring(1, location.length-1);
+              var latlngStr = input.split(",",2);
+              var lat = parseFloat(latlngStr[0]);
+              var lng = parseFloat(latlngStr[1]);
+              location = new google.maps.LatLng(lat, lng);
+              var marker = new google.maps.Marker({
+                position: location,
+                map: map
+              });
+              // Add marker to the marker array
+              markerArray.push(marker);
+              var infowindow = new google.maps.InfoWindow({
+                content: "<a href=\"" + url +"\">" + title + "</a>"
+              });
+              marker.addListener('click', function() {
+              infowindow.open(map,marker)
+              })
+      }
         </script>
         
     </div>
@@ -209,5 +175,4 @@
     </a>
 {% endfor %}
 {% endif %}
-
 {% endblock %}

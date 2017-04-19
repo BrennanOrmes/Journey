@@ -105,7 +105,6 @@
             <div class="panel-body">
               <p>From: {{ event.start_time|date:"D d M Y P" }}</p>
               <p>To: {{ event.end_time|date:"D d M Y P" }}</p>
-              <p>Description: {{ event.description }}</p>
               <p>Tags:</p>
               {% for tag in event.eventTags.all %}
               <p>{{tag.name}}</p>

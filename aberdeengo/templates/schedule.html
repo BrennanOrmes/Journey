@@ -29,6 +29,15 @@
         var directionsService = new google.maps.DirectionsService;
         // Create a renderer for directions and bind it to the map
         var directionsDisplay = new google.maps.DirectionsRenderer;
+        
+        directionsDisplay.setMap(map);
+        directionsDisplay.setOptions( { suppressMarkers: true } );
+        
+        // directionsDisplay.setOptions({
+        //   suppressMarkers: true, 
+        //   suppressInfoWindows: true,
+        //   visible: false
+        // });
 
         var map = new google.maps.Map(document.getElementById('map'), {
           center: {lat: 57.1497, lng: -2.0943},
@@ -192,7 +201,6 @@
             
         <p>From: {{ part_taking.start|date:"D d M Y P" }}</p>
         <p>To: {{ part_taking.end|date:"D d M Y P" }}</p>
-        <p>Description: {{ part_taking.event.description }}</p>
         <p><a class="btn btn-default" onclick="changeTimes('{{forloop.counter0}}')" role="button">Change Times</a></p>
         <p>How will you travel to this event?</p>
         <form id="formA" action="{% url 'schedule'%}" method="post">
