@@ -321,7 +321,7 @@ def accounts(request, username=None):
             'events': events,
             'form': form
         }
-        # context.update(get_social_context(request.user))
+        context.update(get_social_context(currentUser))
         return render_to_response(
             'accounts.html',
             context,
