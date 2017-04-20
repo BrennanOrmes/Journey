@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'paypal.standard.ipn',
     'social_django',
     'haystack',
+    'gunicorn',
 ]
 
 MIDDLEWARE_CLASSES = [
