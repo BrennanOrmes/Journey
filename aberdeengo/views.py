@@ -542,7 +542,7 @@ def handlePayment(sender, **kwargs):
 valid_ipn_received.connect(handlePayment)
 
 
-# @staff_member_required
+@staff_member_required
 def stats(request):
     s = Summary.most_recent(force=True)
     return render(request, 'stats.html', {'summary': s})

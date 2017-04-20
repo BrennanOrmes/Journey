@@ -111,7 +111,7 @@
               {%endif%}
               // At the marker to the array
               startsArray.push(transitStart);
-            {%endwith %}
+            {% endwith %}
             
             directionsService.route({
               origin: markerArray[{{i}}-1].position,
