@@ -21,39 +21,26 @@
  background-attachment: fixed;
  background-position: right; 
  }
+ 
+.grid-sizer,
+.grid-item { width: 22%; }
+
+.gutter-sizer { width: 4%; }
+
+.grid-item--width2 { width: 48%; }
 </style>
 	{% if user.is_authenticated %}
-		<div class="row"><p><b>Featured events</b></p></div>
-		{% for event in featuredEvents %}
-    		<div class="col-xs-12 col-lg-4">
-        		<div class="panel panel-primary">
-            		<div class="panel-heading">
-                		{{ event.title }}
-            		</div>
-            		<div class="panel-body">
-        				<p><b>From:</b> {{ event.start_time|date:"D d M Y P" }}</p>
-    					<p><b>To:</b> {{ event.end_time|date:"D d M Y P" }}</p>
-        				<a href="{% url 'event' event.id %}"><button type="button">View event</button></a>
-    				</div>
-    			</div>
-    		</div>
-    	</div>
-    	{% empty %}
-    		<p>No featured events at this point.</p>
-		{% endfor %}
-		
 		<div class="row col-xs-12 col-lg-12"><p><b>Interests recommendations</b></p></div>
 		{% for event in events_by_interest %}
 			<!--<div class="row"> -->
     		<div class="col-xs-12 col-lg-4">
-        		<div class="panel panel-primary">
-            		<div class="panel-heading">
+        	<div class="panel panel-default">
+            		 <div class="panel-heading clickable" onclick="location.href='{% url 'event' event.id %}'">
                 		{{ event.title }}
             		</div>
             		<div class="panel-body">
         				<p><b>From:</b> {{ event.start_time|date:"D d M Y P" }}</p>
     					<p><b>To:</b> {{ event.end_time|date:"D d M Y P" }}</p>
-        				<a href="{% url 'event' event.id %}"><button type="button">View event</button></a>
     				</div>
     			</div>
     		</div>
@@ -68,14 +55,13 @@
 		{% for event in events_by_other_users %}
 		<div class="row"> 
     		<div class="col-xs-12 col-lg-4">
-        		<div class="panel panel-primary">
-            		<div class="panel-heading">
+        		<div class="panel panel-default">
+            		 <div class="panel-heading clickable" onclick="location.href='{% url 'event' event.id %}'">
                 		{{ event.title }}
             		</div>
             		<div class="panel-body">
         				<p><b>From:</b> {{ event.start_time|date:"D d M Y P" }}</p>
     					<p><b>To:</b> {{ event.end_time|date:"D d M Y P" }}</p>
-        				<a href="{% url 'event' event.id %}"><button type="button">View event</button></a>
     				</div>
     			</div>
     		</div>
@@ -84,18 +70,34 @@
 			<p class="row col-xs-12 col-lg-12">No events recommended for you? Then add some to your schedule so we can start recommending you other events you might like.</p>
 		{% endfor %}
 		
-		
-	{% else %}
-		{% for event in events %}
+		<div class="row col-xs-12 col-lg-12"><p><b>Featured events</b></p></div>
+		{% for event in featuredEvents %}
     		<div class="col-xs-12 col-lg-4">
-        		<div class="panel panel-primary">
-            		<div class="panel-heading">
+        		<div class="panel panel-default">
+            		 <div class="panel-heading clickable" onclick="location.href='{% url 'event' event.id %}'">
                 		{{ event.title }}
             		</div>
         	    	<div class="panel-body">
         				<p><b>From:</b> {{ event.start_time|date:"D d M Y P" }}</p>
     					<p><b>To:</b> {{ event.end_time|date:"D d M Y P" }}</p>
-        				<a href="{% url 'event' event.id %}"><button type="button">View event</button></a>
+    				</div>
+    			</div>
+    		</div>
+    	{% empty %}
+    		<p>No featured events at this point.</p>
+		{% endfor %}
+		
+		
+	{% else %}
+		{% for event in events %}
+    		<div class="col-xs-12 col-lg-4">
+        		<div class="panel panel-default">
+            		 <div class="panel-heading clickable" onclick="location.href='{% url 'event' event.id %}'">
+                		{{ event.title }}
+            		</div>
+        	    	<div class="panel-body">
+        				<p><b>From:</b> {{ event.start_time|date:"D d M Y P" }}</p>
+    					<p><b>To:</b> {{ event.end_time|date:"D d M Y P" }}</p>
     				</div>
     			</div>
     		</div>

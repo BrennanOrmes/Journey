@@ -225,23 +225,14 @@
 {% if length > 0 %}
 <p>This event is a recurrent one. Would you like to check out the other dates as well?</p>
 {% for event in sameGroup %}
-    <div class="row"> 
-		<div class="col-xs-12 col-lg-4">
-    		<div class="panel panel-primary">
-        		<div class="panel-heading">
-            		{{ event.title }}
-        		</div>
-    		<div class="panel-body">
-    		<p><b>From:</b> {{ event.start_time|date:"D d M Y P" }}</p>
-    		<p><b>To:</b> {{ event.end_time|date:"D d M Y P" }}</p>
-    		<p><b>Description:</b> {{ event.description }}</p>
-    		<p><b>Tags:</b></p>
-    		{% for tag in event.eventTags.all %}
-        		<p>{{tag.name}}</p>
-        	{% empty %}
-        		<p>No tags associated with this event</p>
-    		{% endfor %}
-    		<a href="{% url 'event' event.id %}"><button type="button">View event</button></a>
+	<div class="col-xs-12 col-lg-4">
+    	<div class="panel panel-primary">
+    		<div class="panel-heading clickable" onclick="location.href='{% url 'event' event.id %}'">
+        		{{ event.title }}
+    		</div>
+        	<div class="panel-body">
+    	    	<p><b>From:</b> {{ event.start_time|date:"D d M Y P" }}</p>
+    		    <p><b>To:</b> {{ event.end_time|date:"D d M Y P" }}</p>
 	        </div>
 	    </div>
 	</div>
