@@ -33,7 +33,6 @@ pep8==1.7.0
 pexpect==3.1
 pycrypto==2.6.1
 pygpgme==0.3
-python-apt==0.9.3.5ubuntu2
 python-dateutil==1.5
 python-openid==2.2.5
 pytz==2016.10
