@@ -38,13 +38,9 @@ def home(request):
     if request.user.is_anonymous():
         events = []
         events = featured()
-        recurrent = RecurrentEvent.objects.filter(recurrence__gt=0)
-        recurrences = EventOccurence.objects.all()
         template = loader.get_template('index.html')
         context = RequestContext(request, {
-            'events': events,
-            'recurrent': recurrent,
-            'recurrences': recurrences
+            'events': events
         })
         return HttpResponse(template.render(context, request))
     else:
@@ -76,8 +72,9 @@ def home(request):
                 if vote.event == event and vote.othersScore is not 0 and vote.interestScore == 0:
                     events_by_other_users.append(event)
                     
-        lenInterest = len(events_by_interest)
-
+        v = Vote.objects.all()
+        featuredEvents = []
+        featuredEvents = featured()
         template = loader.get_template('index.html')
         context = RequestContext(request, {
             'events_by_interest': events_by_interest,
@@ -85,7 +82,8 @@ def home(request):
             'votes': votes,
             'voteInterest': voteInterest,
             'voteOthers': voteOthers,
-            'lenInterest': lenInterest
+            'featuredEvents': featuredEvents,
+            'v': v
         })
         return HttpResponse(template.render(context, request))
 
@@ -497,7 +495,10 @@ def pay(request, id):
         paypal_dict["custom"] = name
         paypal_dict["amount"] = str(event.price)
         paypal_dict["item_name"] = "buy ticket for" + " " + str(event.title)
-        paypal_dict["business"] = event.user.email
+        if event.user.payment == "":
+            paypal_dict["business"] = event.user.email
+        else:
+            paypal_dict["business"] = event.user.payment
     else:
         paypal_dict["custom"] = "666"
         paypal_dict["amount"] = "0.00"

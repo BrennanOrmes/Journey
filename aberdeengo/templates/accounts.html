@@ -24,29 +24,9 @@
             </p>
             <p><input type="submit" value="Upload" /></p>
         </form>
-    </div>
-
-    <div class="col-xs-9">
-        <div class="row" id="linkrow">
-           <div class="col-xs-9"></div>
-           <div class="col-xs-3">
-               <b>  <a id="profile" data="{% url 'editAccount' %}">
-               Profile
-            </a> </b>
-            <b><a id="events" data="{% url 'ownedEvents' %}">
-               Events
-            </a></b>
-            <b><a id="tickets" data="{% url 'ticketlist' %}">
-               Tickets
-            </a></b>
-           </div>
-        </div>
-        <div class="row" id="main-content"></div>
-
-    </div>
-    <!-- TODO: Style me -->
-    <div>
-    <h2>Settings</h2>
+        
+        <div>
+        <h2>Settings</h2>
 
     <h3>GitHub</h3>
     {% if github_login %}
@@ -96,6 +76,31 @@
         <a href="{% url 'social:begin' 'facebook' %}">Connect to Facebook</a>
     {% endif %}
     </div>
+        
+    </div>
+
+    <div class="col-xs-9">
+        <div class="row" id="linkrow">
+           <div class="col-xs-9"></div>
+           <div class="col-xs-3">
+               <b>  <a id="profile" data="{% url 'editAccount' %}">
+               Profile
+            </a> </b>
+            <b><a id="events" data="{% url 'ownedEvents' %}">
+               Events
+            </a></b>
+            <b><a id="tickets" data="{% url 'ticketlist' %}">
+               Tickets
+            </a></b>
+           </div>
+        </div>
+        <div class="row" id="main-content"></div>
+
+    </div>
+    <!-- TODO: Style me -->
+   
+    
+    
 
 </div>
 {% load static %}
