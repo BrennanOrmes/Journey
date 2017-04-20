@@ -11,8 +11,6 @@ decorator==3.4.0
 django-haystack==2.6.0
 django-paypal==0.3.6
 django-search==1.0
-duplicity==0.6.23
-geopy==1.11.0
 gunicorn==19.6.0
 html5lib==0.999
 httplib2==0.8
