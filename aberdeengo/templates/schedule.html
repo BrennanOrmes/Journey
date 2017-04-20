@@ -1,6 +1,48 @@
 <!--Starting Tags-->
 {% extends "layout.html" %}
 {% load return_item %}
+{% block head_content %}
+  <script type="text/javascript" src="//cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+  <script type="text/javascript" src="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.js"></script>
+  <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.css" />
+  <script type="text/javascript">
+  function install_picker(pickerform) {
+    var options = {
+      timePicker : true,
+      timePickerIncrement : 1,
+      // timePicker24Hour : true,
+      // autoApply : true,
+      locale: {
+        format: 'DD/MM/YYYY h:mm A'
+      }
+    };
+        
+    var pyformat = "YYYY-MM-DDTHH:mm:ssZZ";
+    
+    pickerform.find('input[name="daterange"]').daterangepicker(options);
+    pickerform.find('input[name="daterange"]').on('apply.daterangepicker', function (ev, picker) {
+      pickerform.find('input[name="new_start_time"]').val(picker.startDate.format(pyformat));
+      pickerform.find('input[name="new_end_time"]').val(picker.endDate.format(pyformat));
+    });
+    
+    pickerform.submit(function () {
+      pickerform.find('input[name="daterange"]', this).prop('disabled', true);
+      return true;
+    });
+    
+    var now = moment();
+    var next = moment().add(1,'m');
+
+    // Set Hidden Values
+    pickerform.find('input[name="new_start_time"]').val(now.format(pyformat));
+    pickerform.find('input[name="new_end_time"]').val(next.format(pyformat));
+
+    // Set Date Picker
+    pickerform.find('input[name="daterange"]').data('daterangepicker').setStartDate(now);
+    pickerform.find('input[name="daterange"]').data('daterangepicker').setEndDate(next);
+  }
+  </script>
+{% endblock %}
 {% block content %}
 
 <!--
@@ -174,13 +216,19 @@
         // This is where the user will have to change times to satisfy the schedule.
         function changeTimes(index)
         {
-          timeField =document.getElementById("newFields"+index);
-          timeField.innerHTML = (timeField.innerHTML == '<input type="hidden" name="timeschanged" value="0">') ? '\
-          <label>New start time:</label> \
-          <input type="text" name="new_start_time"></br>\
-          <label>New end time:</label> \
-          <input type="text" name="new_end_time">\
-          <input type="hidden" name="timeschanged" value="1">' : '<input type="hidden" name="timeschanged" value="0">';
+          fieldID = "#newFields" + index;
+          timeField = $(fieldID);
+          if (timeField.find('[name="timeschanged"]').attr("value") == "0") {
+            timeField.html('\
+            	<label for="daterange">New Event Range</label><br>\
+              <input type="text" name="daterange"/><br>\
+              <input type="hidden" name="new_start_time"/>\
+              <input type="hidden" name="new_end_time"/>\
+              <input type="hidden" name="timeschanged" value="1">');
+              
+              install_picker(timeField.closest("form"));
+
+          }
         }
         
     </script>
@@ -201,11 +249,12 @@
             
         <p>From: {{ part_taking.start|date:"D d M Y P" }}</p>
         <p>To: {{ part_taking.end|date:"D d M Y P" }}</p>
-        <p><a class="btn btn-default" onclick="changeTimes('{{forloop.counter0}}')" role="button">Change Times</a></p>
-        <p>How will you travel to this event?</p>
         <form id="formA" action="{% url 'schedule'%}" method="post">
           {% csrf_token %}
-          <div id="newFields{{forloop.counter0}}"><input type="hidden" name="timeschanged" value="0"></div>
+          <div id="newFields{{forloop.counter0}}">
+          <p><a class="btn btn-default" onclick="changeTimes('{{forloop.counter0}}')" role="button">Change Times</a></p>
+          <input type="hidden" name="timeschanged" value="0"></div>
+          <p>How will you travel to this event?</p>
           <input type="radio" name="travel" value="WALKING" {%if part_taking.travelType == "WALKING" %}checked {%endif%}> Walk<br>
           <input type="radio" name="travel" value="DRIVING" {%if part_taking.travelType == "DRIVING" %}checked {%endif%}> Drive<br>
           <input type="radio" name="travel" value="TRANSIT" {%if part_taking.travelType == "TRANSIT" %}checked {%endif%}> Transit

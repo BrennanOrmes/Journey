@@ -1,2 +1,5 @@
 {{ object.title }}
 {{ object.description }}
+{% for tag in object.eventTags.all %}
+  {{ tag.name }}
+{% endfor %}

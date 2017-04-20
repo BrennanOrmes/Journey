@@ -1,4 +1,58 @@
 {% extends "layout.html" %}
+{% block head_content %}
+<!--
+    event.html - Displays Information for Event
+    Author: Team Alpha                                                                          
+    
+    Tested?: Yes
+    Functional?: Yes
+    Merged?: Yes
+    Copyright: (c) 2016 Team Alpha, University of Aberdeen.
+-->
+
+    <script type="text/javascript" src="//cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script type="text/javascript" src="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.js"></script>
+    <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.css" />
+    <script type="text/javascript">
+      $(document).ready(function() {
+        var options = {
+          timePicker : true,
+          timePickerIncrement : 1,
+          // timePicker24Hour : true,
+          // autoApply : true,
+          locale: {
+            format: 'DD/MM/YYYY h:mm A'
+          }
+        };
+        
+        var pyformat = "YYYY-MM-DDTHH:mm:ssZZ";
+        
+        $('input[name="daterange"]').daterangepicker(options);
+        $('input[name="daterange"]').on('apply.daterangepicker', function (ev, picker) {
+
+          $('#formA input[name="startdate"]').val(picker.startDate.format(pyformat));
+          $('#formA input[name="enddate"]').val(picker.endDate.format(pyformat));
+        });
+
+        $('#formA').submit(function () {
+          $('input[name="daterange"]', this).prop('disabled', true);
+            return true;
+        });
+
+        var now = moment();
+        var next = moment().add(1,'m');
+
+        // Set Hidden Values
+        $('#formA input[name="startdate"]').val(now.format(pyformat));
+        $('#formA input[name="enddate"]').val(next.format(pyformat));
+
+        // Set Date Picker
+        $('#formA input[name="daterange"]').data('daterangepicker').setStartDate(now);
+        $('#formA input[name="daterange"]').data('daterangepicker').setEndDate(next);
+
+      });
+    </script>
+{% endblock %}
 {% block content %}
 
 <div class="row"> 
