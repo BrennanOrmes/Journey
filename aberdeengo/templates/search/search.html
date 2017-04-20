@@ -92,12 +92,12 @@
     
    {% if query %}
     <h3>Results</h3>
-      <div class="grid" data-isotope='{ "itemSelector": ".grid-item", "layoutMode": "masonry" }'>
+<div class="row col-xs-12 col-lg-12">
         {% for result in page.object_list %}
         <!--{# Note: You need result.object to get the Event object, result is an EventIndex object #}-->
           {% with result.object as event %}
           {% if event.public == True %}
-          <div class="grid-item">
+          <div class="col-xs-12 col-lg-4">
             <div class="panel panel-default">
               <div class="panel-heading clickable" onclick="location.href='{% url 'event' event.id %}'">
                 {{ event.title }}
@@ -122,6 +122,7 @@
   {% endfor %}
   
 </div>
+
       
       {# The following links to the previous or next pages if there is more than one page of results #}
       {% if page.has_previous or page.has_next %}
@@ -138,24 +139,6 @@
   {% endif %}
   
 </form>
-
-
-<script type="text/javascript">
-  /* global $ */
-  /* global event */
-  
-  event.ready(function (event) {
-    event.evens.bind('loaded', function (event) {
-      $('.grid').isotope({
-        itemSelector: '.grid-item',
-        masonry: {
-          fitWidth: true
-        }
-      });
-    });
-  });
-  
-</script>
 <!--THIS IS BEING USED-->
 
 {%endblock %}
