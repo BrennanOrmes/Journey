@@ -1,1 +1,1 @@
-web: gunicorn journey-2.wsgi --log-file -
+web: gunicorn aberdeengo.wsgi --log-file -
