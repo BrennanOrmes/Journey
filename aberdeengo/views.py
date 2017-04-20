@@ -75,6 +75,8 @@ def home(request):
             for event in Event.objects.all():
                 if vote.event == event and vote.othersScore is not 0 and vote.interestScore == 0:
                     events_by_other_users.append(event)
+                    
+        lenInterest = len(events_by_interest)
 
         template = loader.get_template('index.html')
         context = RequestContext(request, {
@@ -82,7 +84,8 @@ def home(request):
             'events_by_other_users': events_by_other_users,
             'votes': votes,
             'voteInterest': voteInterest,
-            'voteOthers': voteOthers
+            'voteOthers': voteOthers,
+            'lenInterest': lenInterest
         })
         return HttpResponse(template.render(context, request))
 
@@ -152,6 +155,7 @@ def event(request, id):
     else:
         sameGroup = []
     length = len(sameGroup)
+    numTags = len(event.eventTags.all())
     context = {
         'event': event,
         'clashes': clashes,
@@ -161,7 +165,8 @@ def event(request, id):
         'username': username,
         'tickets': event.max_tickets - event.sold_tickets,
         'sameGroup': sameGroup,
-        'length': length
+        'length': length,
+        'numTags': numTags
     }
     return HttpResponse(template.render(context, request))
 

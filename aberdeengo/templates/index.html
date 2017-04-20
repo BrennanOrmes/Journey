@@ -10,28 +10,71 @@
  }
 </style>
 	{% if user.is_authenticated %}
-		<p>{{user.username}}</p>
 		<p>Based on your interests we thought you might also like:</p>
+		<p>lenInterest = {{lenInterest}}</p>
 		{% for event in events_by_interest %}
-			<p><a href="{% url 'event' event.id %}">{{event.title}}</a></p>
+			<div class="row"> 
+    		<div class="col-xs-12 col-lg-4">
+        		<div class="panel panel-primary">
+            		<div class="panel-heading">
+                		{{ event.title }}
+            		</div>
+            		<div class="panel-body">
+        		<p><b>From:</b> {{ event.start_time|date:"D d M Y P" }}</p>
+    			<p><b>To:</b> {{ event.end_time|date:"D d M Y P" }}</p>
+    			<p><b>Description:</b> {{ event.description }}</p>
+    			{% if numTags > 0 %}
+    				<p><b>Tags:</b></p>
+    				{% for tag in event.eventTags.all %}
+        				<p>{{tag.name}}</p>
+    				{% endfor %}
+    			{% endif %}
+        		<a href="{% url 'event' event.id %}"><button type="button">View event</button></a>
+    		</div>
 		{% endfor %}
-		<!--{% for vote in votes %}-->
-		<!--	<p>{{vote.interestScore}}</p>-->
-		<!--{% endfor %}-->
 		<p>Based on events you visited we thought you might also like:</p>
 		{% for event in events_by_other_users %}
-			<p><a href="{% url 'event' event.id %}">{{event.title}}</a></p>
+			<div class="row"> 
+    		<div class="col-xs-12 col-lg-4">
+        		<div class="panel panel-primary">
+            		<div class="panel-heading">
+                		{{ event.title }}
+            		</div>
+            		<div class="panel-body">
+        		<p><b>From:</b> {{ event.start_time|date:"D d M Y P" }}</p>
+    			<p><b>To:</b> {{ event.end_time|date:"D d M Y P" }}</p>
+    			<p><b>Description:</b> {{ event.description }}</p>
+    			{% if numTags > 0 %}
+    				<p><b>Tags:</b></p>
+    				{% for tag in event.eventTags.all %}
+        				<p>{{tag.name}}</p>
+    				{% endfor %}
+    			{% endif %}
+        		<a href="{% url 'event' event.id %}"><button type="button">View event</button></a>
+    		</div>
 		{% endfor %}
-		<!--{% for vote in voteOthers %}-->
-		<!--	<p>{{vote.othersScore}}</p>-->
-		<!--{% endfor %}-->
 	{% else %}
-		<p>Featured events</p>
 		{% for event in events %}
-			<p><a href="{% url 'event' event.id %}">{{event.title}}</a> Attendees = {{event.num_attendees}} Range = {{event.range}}</p>
+			<div class="row"> 
+    		<div class="col-xs-12 col-lg-4">
+        		<div class="panel panel-primary">
+            		<div class="panel-heading">
+                		{{ event.title }}
+            		</div>
+            		<div class="panel-body">
+        		<p><b>From:</b> {{ event.start_time|date:"D d M Y P" }}</p>
+    			<p><b>To:</b> {{ event.end_time|date:"D d M Y P" }}</p>
+    			<p><b>Description:</b> {{ event.description }}</p>
+    			{% if numTags > 0 %}
+    				<p><b>Tags:</b></p>
+    				{% for tag in event.eventTags.all %}
+        				<p>{{tag.name}}</p>
+    				{% endfor %}
+    			{% endif %}
+        		</div>
+        		<a href="{% url 'event' event.id %}"><button type="button">View event</button></a>
+    		</div>
 		{% endfor %}
 	{% endif %}
-
-
-
+	
 {% endblock %}

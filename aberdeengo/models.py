@@ -29,6 +29,7 @@ class CustomUser(User):
     # 'Schedule' needs to be the class name rather than the object to prevent errors
     schedule = models.OneToOneField('Schedule', null=True)  # null is temporary
     profilePicture = models.ImageField('pictures/profile/%Y/%m/%d', null=True)
+    userInterests = models.ManyToManyField(Tag)
 
     def is_active2(self):
         # should we be using the regular django is_active?
@@ -43,8 +44,6 @@ class CustomUser(User):
     def is_new(self):
         threshold = datetime.timedelta(days=7)
         return (timezone.now() - self.date_joined) < threshold
-
-    userInterests = models.ManyToManyField(Tag)
 
 
 class Location(models.Model):
