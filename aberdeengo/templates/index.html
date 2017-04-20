@@ -1,6 +1,19 @@
 {% extends "layout.html" %}
 {% block content %}
 {% load static %}
+
+<!--
+    index.html - Home Page, Displays featuerd events when not
+    logged in and personalised recommendations when logged in
+    
+    Author: Team Alpha                                                                          
+    
+    Tested?: Yes
+    Functional?: Yes
+    Merged?: Yes
+    Copyright: (c) 2016 Team Alpha, University of Aberdeen.
+-->
+
 <style>
  body {
  background-image: url("{% static "logo.jpg" %}");
@@ -10,28 +23,85 @@
  }
 </style>
 	{% if user.is_authenticated %}
-		<p>{{user.username}}</p>
-		<p>Based on your interests we thought you might also like:</p>
+		<div class="row"><p><b>Featured events</b></p></div>
+		{% for event in featuredEvents %}
+    		<div class="col-xs-12 col-lg-4">
+        		<div class="panel panel-primary">
+            		<div class="panel-heading">
+                		{{ event.title }}
+            		</div>
+            		<div class="panel-body">
+        				<p><b>From:</b> {{ event.start_time|date:"D d M Y P" }}</p>
+    					<p><b>To:</b> {{ event.end_time|date:"D d M Y P" }}</p>
+        				<a href="{% url 'event' event.id %}"><button type="button">View event</button></a>
+    				</div>
+    			</div>
+    		</div>
+    	</div>
+    	{% empty %}
+    		<p>No featured events at this point.</p>
+		{% endfor %}
+		
+		<div class="row col-xs-12 col-lg-12"><p><b>Interests recommendations</b></p></div>
 		{% for event in events_by_interest %}
-			<p><a href="{% url 'event' event.id %}">{{event.title}}</a></p>
+			<!--<div class="row"> -->
+    		<div class="col-xs-12 col-lg-4">
+        		<div class="panel panel-primary">
+            		<div class="panel-heading">
+                		{{ event.title }}
+            		</div>
+            		<div class="panel-body">
+        				<p><b>From:</b> {{ event.start_time|date:"D d M Y P" }}</p>
+    					<p><b>To:</b> {{ event.end_time|date:"D d M Y P" }}</p>
+        				<a href="{% url 'event' event.id %}"><button type="button">View event</button></a>
+    				</div>
+    			</div>
+    		</div>
+    	<!--</div>-->
+    		<!--</div>-->
+    	{% empty %}
+    	 <p class="row col-xs-12 col-lg-12">No events recommended for you? Then go on your account and add some interests so we can start showing you events you might be interested in.</p>
 		{% endfor %}
-		<!--{% for vote in votes %}-->
-		<!--	<p>{{vote.interestScore}}</p>-->
-		<!--{% endfor %}-->
-		<p>Based on events you visited we thought you might also like:</p>
+		
+		<div class="row col-xs-12 col-lg-12"><p><b>Visited events recommendations</b></p></div>
+		<!--<p><b>Visited events recommendations</b></p>-->
 		{% for event in events_by_other_users %}
-			<p><a href="{% url 'event' event.id %}">{{event.title}}</a></p>
+		<div class="row"> 
+    		<div class="col-xs-12 col-lg-4">
+        		<div class="panel panel-primary">
+            		<div class="panel-heading">
+                		{{ event.title }}
+            		</div>
+            		<div class="panel-body">
+        				<p><b>From:</b> {{ event.start_time|date:"D d M Y P" }}</p>
+    					<p><b>To:</b> {{ event.end_time|date:"D d M Y P" }}</p>
+        				<a href="{% url 'event' event.id %}"><button type="button">View event</button></a>
+    				</div>
+    			</div>
+    		</div>
+    	</div>
+    	{% empty %}
+			<p class="row col-xs-12 col-lg-12">No events recommended for you? Then add some to your schedule so we can start recommending you other events you might like.</p>
 		{% endfor %}
-		<!--{% for vote in voteOthers %}-->
-		<!--	<p>{{vote.othersScore}}</p>-->
-		<!--{% endfor %}-->
+		
+		
 	{% else %}
-		<p>Featured events</p>
 		{% for event in events %}
-			<p><a href="{% url 'event' event.id %}">{{event.title}}</a> Attendees = {{event.num_attendees}} Range = {{event.range}}</p>
+    		<div class="col-xs-12 col-lg-4">
+        		<div class="panel panel-primary">
+            		<div class="panel-heading">
+                		{{ event.title }}
+            		</div>
+        	    	<div class="panel-body">
+        				<p><b>From:</b> {{ event.start_time|date:"D d M Y P" }}</p>
+    					<p><b>To:</b> {{ event.end_time|date:"D d M Y P" }}</p>
+        				<a href="{% url 'event' event.id %}"><button type="button">View event</button></a>
+    				</div>
+    			</div>
+    		</div>
+    	{% empty %}
+    		<p>No featured events at this point.</p>
 		{% endfor %}
 	{% endif %}
-
-
-
+	
 {% endblock %}

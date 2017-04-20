@@ -38,13 +38,9 @@ def home(request):
     if request.user.is_anonymous():
         events = []
         events = featured()
-        recurrent = RecurrentEvent.objects.filter(recurrence__gt=0)
-        recurrences = EventOccurence.objects.all()
         template = loader.get_template('index.html')
         context = RequestContext(request, {
-            'events': events,
-            'recurrent': recurrent,
-            'recurrences': recurrences
+            'events': events
         })
         return HttpResponse(template.render(context, request))
     else:
@@ -75,14 +71,19 @@ def home(request):
             for event in Event.objects.all():
                 if vote.event == event and vote.othersScore is not 0 and vote.interestScore == 0:
                     events_by_other_users.append(event)
-
+                    
+        v = Vote.objects.all()
+        featuredEvents = []
+        featuredEvents = featured()
         template = loader.get_template('index.html')
         context = RequestContext(request, {
             'events_by_interest': events_by_interest,
             'events_by_other_users': events_by_other_users,
             'votes': votes,
             'voteInterest': voteInterest,
-            'voteOthers': voteOthers
+            'voteOthers': voteOthers,
+            'featuredEvents': featuredEvents,
+            'v': v
         })
         return HttpResponse(template.render(context, request))
 
@@ -152,6 +153,7 @@ def event(request, id):
     else:
         sameGroup = []
     length = len(sameGroup)
+    numTags = len(event.eventTags.all())
     context = {
         'event': event,
         'clashes': clashes,
@@ -161,7 +163,8 @@ def event(request, id):
         'username': username,
         'tickets': event.max_tickets - event.sold_tickets,
         'sameGroup': sameGroup,
-        'length': length
+        'length': length,
+        'numTags': numTags
     }
     return HttpResponse(template.render(context, request))
 

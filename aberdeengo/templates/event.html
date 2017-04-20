@@ -68,13 +68,15 @@
         {% if inconsistentTime %}
             <div class="alert-warning" role="alert">Time scheduled is {{inconsistentTime}}</div>
         {% endif %}
-        <p>From: {{ event.start_time|date:"D d M Y P" }}</p>
-        <p>To: {{ event.end_time|date:"D d M Y P" }}</p>
-        <p>Description: {{ event.description }}</p>
-        <p>Tags:</p>
-        {% for tag in event.eventTags.all %}
-            <p>{{tag.name}}</p>
-        {% endfor %}
+        <p><b>From:</b> {{ event.start_time|date:"D d M Y P" }}</p>
+    	<p><b>To:</b> {{ event.end_time|date:"D d M Y P" }}</p>
+    	<p><b>Description:</b> {{ event.description }}</p>
+    	<p><b>Tags:</b></p>
+    	{% for tag in event.eventTags.all %}
+        	<p>{{tag.name}}</p>
+        {% empty %}
+        	<p>No tags associated with this event</p>
+    	{% endfor %}
         <form action="{% url 'scheduleevent' %}" method="post" id="formA">
             {% csrf_token %}
             <input type="hidden" name="event_id" value="{{ event.id }}" /> 
@@ -219,14 +221,30 @@
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyClKcWsgdYmlnLItSUiD5YaJgbrD9ahed4&callback=initMap"> </script>
 
 </div>
+
 {% if length > 0 %}
 <p>This event is a recurrent one. Would you like to check out the other dates as well?</p>
-{% for e in sameGroup %}
-    <a href="{% url 'event' e.id %}">
-            <p>{{e.title}}</p>
-            <p>{{e.start_time}}</p>
-            <br>
-    </a>
+{% for event in sameGroup %}
+    <div class="row"> 
+		<div class="col-xs-12 col-lg-4">
+    		<div class="panel panel-primary">
+        		<div class="panel-heading">
+            		{{ event.title }}
+        		</div>
+    		<div class="panel-body">
+    		<p><b>From:</b> {{ event.start_time|date:"D d M Y P" }}</p>
+    		<p><b>To:</b> {{ event.end_time|date:"D d M Y P" }}</p>
+    		<p><b>Description:</b> {{ event.description }}</p>
+    		<p><b>Tags:</b></p>
+    		{% for tag in event.eventTags.all %}
+        		<p>{{tag.name}}</p>
+        	{% empty %}
+        		<p>No tags associated with this event</p>
+    		{% endfor %}
+    		<a href="{% url 'event' event.id %}"><button type="button">View event</button></a>
+	        </div>
+	    </div>
+	</div>
 {% endfor %}
 {% endif %}
 {% endblock %}
