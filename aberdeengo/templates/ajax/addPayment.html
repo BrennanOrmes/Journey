@@ -1,9 +1,5 @@
 <form id="" action="{% url 'addPayment'%}" method="post"> {% csrf_token %}
-  <p> Pick a payment option</p>
-  <select name="payment">
-   <option value="paypal"> paypal</option>
-     <option value="debit card"> debit card</option>
-    <option value="credit card">credit card </option>
-    </select>
-  <input type="submit" value="save" />
-</form>
+  <p> Enter your paypal email address (will be used to make payments to you when you create ticketed events)</p>
+   <input type="email" name="payment">
+   <input type="submit" value="save" >
+   </form>

@@ -492,7 +492,10 @@ def pay(request, id):
         paypal_dict["custom"] = name
         paypal_dict["amount"] = str(event.price)
         paypal_dict["item_name"] = "buy ticket for" + " " + str(event.title)
-        paypal_dict["business"] = event.user.email
+        if event.user.payment == "":
+            paypal_dict["business"] = event.user.email
+        else:
+            paypal_dict["business"] = event.user.payment
     else:
         paypal_dict["custom"] = "666"
         paypal_dict["amount"] = "0.00"
