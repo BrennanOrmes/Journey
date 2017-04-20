@@ -227,13 +227,12 @@
 {% for event in sameGroup %}
 	<div class="col-xs-12 col-lg-4">
     	<div class="panel panel-primary">
-    		<div class="panel-heading">
+    		<div class="panel-heading clickable" onclick="location.href='{% url 'event' event.id %}'">
         		{{ event.title }}
     		</div>
         	<div class="panel-body">
     	    	<p><b>From:</b> {{ event.start_time|date:"D d M Y P" }}</p>
     		    <p><b>To:</b> {{ event.end_time|date:"D d M Y P" }}</p>
-    		    <a href="{% url 'event' event.id %}"><button type="button">View event</button></a>
 	        </div>
 	    </div>
 	</div>
