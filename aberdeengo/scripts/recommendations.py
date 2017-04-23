@@ -6,15 +6,15 @@ import operator
     recommendations.py - Provides the recommendation algorithms
     used in views.py to generate events to be recommended
     to each user
-    
-    Author: Team Alpha                                                                          
-    
+
+    Author: Team Alpha
+
     Tested?: Yes
     Functional?: Yes
     Merged?: Yes
     Copyright: (c) 2016 Team Alpha, University of Aberdeen.
-'''    
-    
+'''
+
 '''
 recommendations by interest: compares the user's interests with the
 tags of each event and produces a score for each event based on this.
@@ -51,7 +51,6 @@ def recommend_by_other_users(user):
                         Vote.objects.filter(user=user).filter(event=otherEvent).update(othersScore=1)
                     elif event.public is True and otherEvent not in user.schedule.events.all() and otherEvent in recommendations:
                         Vote.objects.filter(user=user).filter(event=otherEvent).update(othersScore=F('othersScore') + 1)
-
 
 '''
 featured events: produces a sorted list of all the public

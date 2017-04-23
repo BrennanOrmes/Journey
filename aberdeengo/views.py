@@ -71,7 +71,7 @@ def home(request):
             for event in Event.objects.all():
                 if vote.event == event and vote.othersScore is not 0 and vote.interestScore == 0:
                     events_by_other_users.append(event)
-                    
+
         v = Vote.objects.all()
         featuredEvents = []
         featuredEvents = featured()
@@ -97,7 +97,7 @@ def searchEvents(request):
     events = Event.search(search_string, user_tags)  # TODO: add limiting
     events.sort(key=lambda x: x.start_time)
     template = loader.get_template('search.html')
-    context = RequestContext(request,{
+    context = RequestContext(request, {
         'events': events
     })
     return HttpResponse(template.render(context, request))
@@ -318,7 +318,7 @@ def accounts(request, username=None):
                 currentUser.save()
             else:
                 messages.error(request, "Error")
-        return HttpResponseRedirect('/accounts/'+ currentUsername)
+        return HttpResponseRedirect('/accounts/' + currentUsername)
     else:
         events = Event.objects.filter(user=currentUser).order_by('publication_date')
         form = DocumentForm()
@@ -443,7 +443,8 @@ def change_password(request):
         'form': form
     })
 
-#this sets the paypal email address
+
+# this sets the paypal email address
 def addPayment(request):
     if request.method == 'POST':
         currentUsername = request.user.username
@@ -460,10 +461,11 @@ def addPayment(request):
     else:
         return render(request, 'ajax/addPayment.html')
 
-#this is the paypal button information 
+
+# this is the paypal button information
 @login_required
 def pay(request, id):
-    #this dictionary takes care of the values needed to be processed through paypal
+    # this dictionary takes care of the values needed to be processed through paypal
     paypal_dict = {
         "business": "teamalphaau@gmail.com",
         "currency_code": "GBP",
@@ -473,12 +475,12 @@ def pay(request, id):
         "cancel_return": request.build_absolute_uri(reverse('event', args=[id])),
         "item_number": id,
     }
-    #through the hidden form data on the event page the type of payment is being processed
+    # through the hidden form data on the event page the type of payment is being processed
     payment = request.POST.get('pay', '')
     event = Event.find_by_id(int(id))
     name = str(request.user.username)
-    
-    #paying to boost the range of event is set to different prices
+
+    # paying to boost the range of event is set to different prices
     if payment == "range1":
         paypal_dict["custom"] = "1"
         paypal_dict["amount"] = "1.50"
@@ -495,13 +497,13 @@ def pay(request, id):
         paypal_dict["custom"] = "0"
         paypal_dict["amount"] = "1.00"
         paypal_dict["item_name"] = "make event public"
-        #handles ticket purchases
+        # handles ticket purchases
     elif payment == "ticket":
         paypal_dict["custom"] = name
         paypal_dict["amount"] = str(event.price)
         paypal_dict["item_name"] = "buy ticket for" + " " + str(event.title)
-        #takes the payment email address unless the user kept it empty,
-        #then it uses the email used to creat the account
+        # takes the payment email address unless the user kept it empty,
+        # then it uses the email used to creat the account
         if event.user.payment == "":
             paypal_dict["business"] = event.user.email
         else:
@@ -516,41 +518,42 @@ def pay(request, id):
     context = {"form": form, "event": event, "pay": payment, }
     return render(request, "payment.html", context)
 
-#this methods fires when a payment has been made through paypal
+
+# this methods fires when a payment has been made through paypal
 def handlePayment(sender, **kwargs):
     ipn_obj = sender
     eventid = int(ipn_obj.item_number)
     e = Event.find_by_id(eventid)
 
-
-    #this checks the custom values given through the payment system and applies various functions based on that
+    # this checks the custom values given through the payment system and applies various functions based on that
     if ipn_obj.custom == "0":
-        e.public = True #set the event to public
-        #apply boosters to the event
+        e.public = True  # set the event to public
+        # apply boosters to the event
     elif ipn_obj.custom == "1":
         e.range = 50
     elif ipn_obj.custom == "2":
         e.range = 100
     elif ipn_obj.custom == "3":
         e.range = 250
-    elif ipn_obj.custom == "666": #if something went wrong, do nothing just send a redirect
+    elif ipn_obj.custom == "666":  # if something went wrong, do nothing just send a redirect
         return redirect(event, eventid)
-    else: #this custom value needed to be reserved for the username
+    else:  # this custom value needed to be reserved for the username
         e.sold_tickets += 1
         e.save()
-        #get user based on the username input passed through paypal
+        # get user based on the username input passed through paypal
         currentUsername = str(ipn_obj.custom)
         currentUser = CustomUser.objects.get(username=currentUsername)
-        #assign a random string with the username from the purchaser to create the ticket code
+        # assign a random string with the username from the purchaser to create the ticket code
         string = currentUsername + "-" + get_random_string(length=16)
-        t = Ticket(user=currentUser, event=e, code=string) #save that ticket
+        t = Ticket(user=currentUser, event=e, code=string)  # save that ticket
         t.save()
         return redirect(event, int(eventid))
 
     e.save()
     return redirect(event, int(eventid))
 
-#this tells the system which function it should fire when payment is received
+
+# this tells the system which function it should fire when payment is received
 valid_ipn_received.connect(handlePayment)
 
 
@@ -559,12 +562,13 @@ def stats(request):
     s = Summary.most_recent(force=True)
     return render(request, 'stats.html', {'summary': s})
 
-#the create ticket page that sets the number and price of the ticket on an event
+
+# the create ticket page that sets the number and price of the ticket on an event
 def createticket(request, id):
-    #find event based on url id
+    # find event based on url id
     currentEvent = Event.find_by_id(id)
     if request.method == 'POST':
-        #get form info and set the required fields
+        # get form info and set the required fields
         currentEvent.max_tickets = request.POST.get('number', '')
         currentEvent.price = request.POST.get('price', '')
         currentEvent.save()
@@ -572,20 +576,22 @@ def createticket(request, id):
     ticket = Ticket.objects.filter(event=currentEvent)
     return render(request, 'createTickets.html', {'id': id, 'ticket': ticket})
 
-#this is the list of tickets that the user bought and can go into to check each ticket
+
+# this is the list of tickets that the user bought and can go into to check each ticket
 def ticketlist(request):
-    #get the current user
+    # get the current user
     currentUsername = request.user.username
     currentUser = CustomUser.objects.get(username=currentUsername)
-    #get the tickets associated by the user from the db
+    # get the tickets associated by the user from the db
     tickets = Ticket.objects.filter(user=currentUser)
     context = {'tickets': tickets}
     template = loader.get_template('ajax/ticketlist.html')
     return HttpResponse(template.render(context, request))
 
-#this is the ticket page that leads to the unique tickets for each person
+
+# this is the ticket page that leads to the unique tickets for each person
 def ticket(request, id):
-    #it can only be accessed through post because of security issues, otherwise anyone can access it
+    # it can only be accessed through post because of security issues, otherwise anyone can access it
     if request.method == 'POST':
         # this just gets the ticket id and loads it from the db and passes it to the HTML
         ticket = Ticket.objects.get(id=id)
