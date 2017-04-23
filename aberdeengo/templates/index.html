@@ -53,7 +53,6 @@
 		<div class="row col-xs-12 col-lg-12"><p><b>Visited events recommendations</b></p></div>
 		<!--<p><b>Visited events recommendations</b></p>-->
 		{% for event in events_by_other_users %}
-		<div class="row"> 
     		<div class="col-xs-12 col-lg-4">
         		<div class="panel panel-default">
             		 <div class="panel-heading clickable" onclick="location.href='{% url 'event' event.id %}'">
@@ -65,7 +64,6 @@
     				</div>
     			</div>
     		</div>
-    	</div>
     	{% empty %}
 			<p class="row col-xs-12 col-lg-12">No events recommended for you? Then add some to your schedule so we can start recommending you other events you might like.</p>
 		{% endfor %}
