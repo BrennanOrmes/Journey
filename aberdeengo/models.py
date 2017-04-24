@@ -239,10 +239,15 @@ class Schedule(models.Model):
         else:
             return events[0]
 
-    def scheduled_events(self):
-        """Returns a list of all the events in this schedule"""
-        # TODO: should we be deleting events that have already passed? No, we should just not display them. It's good to have them in the database for statistics
-        return sorted(self.scheduleentry_set.all(), key=lambda x: x.start)
+    def scheduled_events(self,all=False):
+        """Returns a list of scheduled events.
+        If keyword argument all is True, then all events that have been
+        scheduled are included. By default, only the events that have not
+        passed are included.
+        """
+        now = datetime.datetime.now()
+        events = self.scheduleentry_set.filter(end__gte=now)
+        return sorted(events, key=lambda x: x.start)
 
 
 class ScheduleEntry(models.Model):

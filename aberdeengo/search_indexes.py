@@ -25,7 +25,7 @@ class EventIndex(indexes.SearchIndex, indexes.Indexable):
     def get_model(self):
         return Event
 
-    # def index_queryset(self, using=None):
-    #     # Only indexes events that are more current than now
-    #     # TODO: do we still want to index old events?
-    #     return self.get_model().objects.filter(pub_date__gte=datetime.datetime.now())
+    def index_queryset(self, using=None):
+        # Only indexes events that are more current than now
+        # TODO: do we still want to index old events?
+        return self.get_model().objects.filter(end_time__gte=datetime.datetime.now())
