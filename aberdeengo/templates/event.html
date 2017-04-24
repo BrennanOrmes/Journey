@@ -142,7 +142,7 @@
                 <form action="{% url 'pay' event.id %}" method="post">
                     {% csrf_token %}
                      <input type="hidden" name="pay" value="ticket" />
-                       <input type="submit" value="buy tickets" /> : {{tickets}} left at £{{event.price}} each
+                       <input type="submit" value="buy tickets" /> : {{tickets}} left at £{{event.price}}0 each
                      </form>
             {% endif%}
             </div>
