@@ -509,7 +509,7 @@ def pay(request, id):
         # handles ticket purchases
     elif payment == "ticket":
         paypal_dict["custom"] = name
-        paypal_dict["amount"] = str(event.price)
+        paypal_dict["amount"] = str(event.price) + "0"
         paypal_dict["item_name"] = "buy ticket for" + " " + str(event.title)
         # takes the payment email address unless the user kept it empty,
         # then it uses the email used to creat the account

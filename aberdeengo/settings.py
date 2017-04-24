@@ -35,7 +35,7 @@ SECRET_KEY = 'hu&)bdmx#l4^kzuat-g%juyqqd!$7+uy8vu5%c1_y#ug(s*d&('
 API_KEY = 'AIzaSyClKcWsgdYmlnLItSUiD5YaJgbrD9ahed4'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')

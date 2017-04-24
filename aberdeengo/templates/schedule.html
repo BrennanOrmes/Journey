@@ -206,7 +206,7 @@
           // Calculate how long it will take to get to the event
           timeToTravel = (endsArray[index].getTime() - startsArray[index].getTime())/60000;
           if (startsArray[index].getTime() + duration*1000 < endsArray[index].getTime()) { 
-            document.getElementById("display"+index).innerHTML = "it's all fine and dandy";
+            //document.getElementById("display"+index).innerHTML = "it's all fine and dandy";
           }
           // If the user cannot get to the event in time they will be prompted to change their times.
           else {
@@ -234,12 +234,12 @@
     </script>
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyClKcWsgdYmlnLItSUiD5YaJgbrD9ahed4&callback=initMap">
     </script>
-        <ul class="schedules">
+        <!--<ul class="schedules">-->
           <!--is this fixed?-->
         {# FIXME: this shows all events even those that are past #} 
-        <div class="grid" data-isotope='{ "itemSelector": ".grid-item", "layoutMode": "masonry" }'>
+       <div class="row col-xs-12 col-lg-12">
           {% for part_taking in schedule.scheduled_events %}
-          <div class="grid-item">
+          <div class="col-xs-12 col-lg-4">
           <div class="panel panel-default">
             <!--<a href="{% url 'event' part_taking.event.id %}">-->
             <div class="panel-heading clickable" onclick="location.href='{% url 'event' part_taking.event.id %}'">
@@ -276,7 +276,7 @@
         {% endfor %}
         </div>
         
-        </ul>
+        <!--</ul>-->
 
 <script type="text/javascript">
   /* global $ */
