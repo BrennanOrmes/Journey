@@ -10,7 +10,7 @@
     Copyright: (c) 2017 Team Alpha, University of Aberdeen.
 '''
 from __future__ import unicode_literals
-from schedule import Schedule, InconsistentTime
+from django.models import Schedule, InconsistentTime
 from event import Event
 from django.utils.dateparse import parse_datetime
 from datetime import datetime
