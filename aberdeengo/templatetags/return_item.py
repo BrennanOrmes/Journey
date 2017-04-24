@@ -1,3 +1,13 @@
+'''
+    return_item.py - Custom Template Tags.
+
+    Author: Team Alpha
+
+    Tested?: Yes
+    Functional?: Yes
+    Merged?: Yes
+    Copyright: (c) 2017 Team Alpha, University of Aberdeen.
+'''
 from django import template
 from aberdeengo.models import *
 from datetime import datetime

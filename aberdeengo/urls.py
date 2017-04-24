@@ -1,4 +1,12 @@
-"""aberdeengo URL Configuration
+"""
+    urls.py - URL configuration.
+
+    Author: Team Alpha
+
+    Tested?: Yes
+    Functional?: Yes
+    Merged?: Yes
+    Copyright: (c) 2016, 2017 Team Alpha, University of Aberdeen.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/1.9/topics/http/urls/

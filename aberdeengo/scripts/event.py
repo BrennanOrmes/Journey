@@ -1,4 +1,14 @@
 # -*- coding: utf-8 -*-
+'''
+    event.py - Customised Class Implementation.
+
+    Author: Team Alpha
+
+    Tested?: Yes
+    Functional?: Yes
+    Merged?: Yes
+    Copyright: (c) 2017 Team Alpha, University of Aberdeen.
+'''
 from ..models import Event
 
 
