@@ -1,0 +1,34 @@
+This is an excerpt from our maintenance manual. For more details you
+should refer to it.
+
+Installation
+============
+
+Clone from the git repository
+
+  git clone git@bitbucket.org:carolsescu/aberdeengo.git
+
+Change to the AberdeenGo directory
+
+  cd aberdeengo
+
+Install all the dependencies. This is accomplished using the Python
+Pip package manager.
+
+  sudo pip install -r requirements.txt
+
+Python will automatically byte-compile files as it runs them, so no
+compilation step is necessary.
+
+Test Run
+========
+
+Having installed the software, the website can then be run locally
+with Django's development server.
+
+  python manage.py runserver
+
+The web page can be accessed locally from http://127.0.0.1:8000/.
+
+The software comes with a test SQLite3 database, so you can
+immediately try it out.
