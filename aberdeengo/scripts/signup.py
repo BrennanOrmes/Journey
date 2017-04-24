@@ -1,3 +1,13 @@
+'''
+    signup.py - Custom Registration Forms.
+
+    Author: Team Alpha
+
+    Tested?: Yes
+    Functional?: Yes
+    Merged?: Yes
+    Copyright: (c) 2017 Team Alpha, University of Aberdeen.
+'''
 from django import forms
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _

@@ -1,4 +1,14 @@
 # -*- coding: utf-8 -*-
+'''
+    test.py - For Test Data.
+
+    Author: Team Alpha
+
+    Tested?: Yes
+    Functional?: Yes
+    Merged?: Yes
+    Copyright: (c) 2017 Team Alpha, University of Aberdeen.
+'''
 from __future__ import unicode_literals
 from schedule import Schedule, InconsistentTime
 from event import Event

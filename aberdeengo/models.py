@@ -1,3 +1,13 @@
+'''
+    models.py - Django ORM Classes
+
+    Author: Team Alpha
+
+    Tested?: Yes
+    Functional?: Yes
+    Merged?: Yes
+    Copyright: (c) 2016, 2017 Team Alpha, University of Aberdeen.
+'''
 from django.db import models
 from django.contrib.auth.models import User, UserManager
 from django.utils import timezone

@@ -1,5 +1,12 @@
 """
-WSGI config for aberdeengo project.
+    wsgi.py - WSGI configuration.
+
+    Author: Team Alpha
+
+    Tested?: Yes
+    Functional?: Yes
+    Merged?: Yes
+    Copyright: (c) 2016, 2017 Team Alpha, University of Aberdeen.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 

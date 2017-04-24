@@ -1,3 +1,13 @@
+'''
+    social.py - Social Authentication Utilities.
+
+    Author: Team Alpha
+
+    Tested?: Yes
+    Functional?: Yes
+    Merged?: Yes
+    Copyright: (c) 2017 Team Alpha, University of Aberdeen.
+'''
 from social_django.models import UserSocialAuth
 
 

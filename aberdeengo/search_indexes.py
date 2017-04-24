@@ -1,3 +1,14 @@
+'''
+    search_indexes.py - Haystack indexes for models.py.
+
+    Author: Team Alpha
+
+    Tested?: Yes
+    Functional?: Yes
+    Merged?: Yes
+    Copyright: (c) 2017 Team Alpha, University of Aberdeen.
+'''
+
 import datetime
 from haystack import indexes
 from models import Event

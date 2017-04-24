@@ -1,7 +1,3 @@
-from ..models import CustomUser, Event, Vote
-from django.db.models import F
-import operator
-
 '''
     recommendations.py - Provides the recommendation algorithms
     used in views.py to generate events to be recommended
@@ -12,8 +8,12 @@ import operator
     Tested?: Yes
     Functional?: Yes
     Merged?: Yes
-    Copyright: (c) 2016 Team Alpha, University of Aberdeen.
+    Copyright: (c) 2017 Team Alpha, University of Aberdeen.
 '''
+from ..models import CustomUser, Event, Vote
+from django.db.models import F
+import operator
+
 
 '''
 recommendations by interest: compares the user's interests with the
