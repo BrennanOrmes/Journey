@@ -1,3 +1,13 @@
+'''
+    views.py - Generates Responses to Http Requests.
+
+    Author: Team Alpha
+
+    Tested?: Yes
+    Functional?: Yes
+    Merged?: Yes
+    Copyright: (c) 2016, 2017 Team Alpha, University of Aberdeen.
+'''
 from django.shortcuts import render, redirect, render_to_response
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.template import loader, RequestContext
@@ -19,7 +29,6 @@ from paypal.standard.ipn.signals import payment_was_successful
 from datetime import timedelta
 
 from scripts.event import Event
-from scripts.schedule import Schedule, EventsClash, InconsistentTime
 from scripts.test import user_tags, date
 from scripts.social import get_social_context
 
