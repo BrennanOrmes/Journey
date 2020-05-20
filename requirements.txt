@@ -11,7 +11,7 @@ decorator==3.4.0
 django-haystack==2.6.0
 django-paypal==0.3.6
 gunicorn==19.6.0
-httplib2==0.8
+httplib2==0.18.0
 ipython==1.2.1
 keyring==3.5
 launchpadlib==1.10.2
