@@ -12,7 +12,7 @@ django-haystack==2.6.0
 django-paypal==0.3.6
 gunicorn==19.6.0
 httplib2==0.8
-ipython==1.2.1
+ipython==7.16.3
 keyring==3.5
 launchpadlib==1.10.2
 lazr.authentication==0.1.3
