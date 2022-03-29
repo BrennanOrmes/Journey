@@ -24,7 +24,7 @@ mercurial==2.8.2
 numpy==1.8.2
 oauth==1.0.1
 oauthlib==2.0.2
-paramiko==1.10.1
+paramiko==2.10.1
 paypal==1.2.5
 pbr==1.10.0
 pep8==1.7.0
